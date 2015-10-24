@@ -33,7 +33,11 @@ public class PersonBrain : MonoBehaviour {
     /** Minimum time the person will stand still if idle */
     public float minIdleTime = 0.5f;
     /** Maximum time the person will stand still if idle */
-    public float maxIdleTime = 0.5f;
+    public float maxIdleTime = 2.0f;
+    /** Minimum time the person will walk */
+    public float minWalkTime = 2.0f;
+    /** Maximum time the person will walk */
+    public float maxWalkTime = 5.0f;
     /** Current state of the person, relative to the player */
     public enState state;
     /** Which of the classes the instance represent */
@@ -44,34 +48,84 @@ public class PersonBrain : MonoBehaviour {
     private enAIState aiState;
     /** Probably unneeded, but avoids calling the coroutine if it's already running */
     private bool isRunningAI;
+    /** The currently running coroutine (duh!) */
+    private Coroutine runningCoroutine = null;
 
 	// Use this for initialization
 	void Start () {
-	
-	}
+
+    }
 	
 	// Update is called once per frame
 	void Update () {
         // TODO Set the animation according with the state
 
+        // TODO Check if trying to go out of borders and stop (i.e., force idle)
+
         if (!isRunningAI) {
-            StartCoroutine("doAI");
+            this.runningCoroutine = StartCoroutine(doAI());
         }
 	}
 
     private IEnumerator doAI() {
-        isRunningAI = true;
+        this.isRunningAI = true;
         switch (aiState) {
             case enAIState.idle: {
                 float time;
 
                 time = Random.Range(minIdleTime, maxIdleTime);
 
+                Debug.Log("Idle for " + time.ToString() + "s");
                 yield return new WaitForSeconds(time);
+                Debug.Log("Exiting idle!");
 
-                // TODO Select new state
+                // Select new state
+                if (Random.Range(0, 1) == 0) {
+                    this.aiState = enAIState.walk;
+                }
+                else {
+                    this.aiState = enAIState.idle;
+                }
+            } break;
+            case enAIState.walk:
+            {
+                float time;
+
+                time = Random.Range(minWalkTime, maxWalkTime);
+
+                // TODO Set speed
+
+                Debug.Log("Walking for " + time.ToString() + "s");
+                yield return new WaitForSeconds(time);
+                Debug.Log("Exiting walk!");
+    
+                // Always go back to idle, after this
+                this.aiState = enAIState.idle;
+             } break;
+            case enAIState.talk: {
+
+            } break;
+            case enAIState.getBribed: {
+
             } break;
         }
+        this.isRunningAI = false;
+        this.runningCoroutine = null;
+    }
+
+    /**
+     * Force this person to switch its state
+     */
+    private void forceAIState(enAIState aiState) {
+        // Enable the next coroutine to start
+        this.isRunningAI = false;
+        // Switch the state
+        this.aiState = aiState;
+        // Stop the current coroutine
+        if (this.runningCoroutine != null) {
+            StopCoroutine(this.runningCoroutine);
+        }
+        this.runningCoroutine = null;
     }
 
     /**
@@ -86,12 +140,10 @@ public class PersonBrain : MonoBehaviour {
         this.color = color;
 
         // Always start on idle
-        this.aiState = enAIState.idle;
-        // Enable running the AI loop
-        this.isRunningAI = false;
+        forceAIState(enAIState.idle);
 
         // TODO Set this only on the shirt sprite
-        GetComponent<SpriteRenderer>().color = color;
+        GetComponent<SpriteRenderer>().color = this.color;
 
         // TODO Randomize the position
         this.transform.position.Set(0, 0, 0);
