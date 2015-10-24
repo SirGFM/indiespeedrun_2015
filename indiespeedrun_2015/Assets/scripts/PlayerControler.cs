@@ -1,7 +1,9 @@
 ﻿using UnityEngine;
-using System.Collections;
+using System.Collections.Generic;
 
 public class PlayerControler : PersonBrain {
+
+    private List<PersonBrain> overlapping;
 
     /** Whether an 'move toward mouse' command was issued */
     private bool hasMouseTarget = false;
@@ -11,13 +13,13 @@ public class PlayerControler : PersonBrain {
     private Transform personTarget;
 
     /** Whether the player just pressed the action button */
-    private bool justPressedAction = false;
+    public bool justPressedAction = false;
     /** Whether the action button was pressed on the last frame */
-    private bool didPressAction = false;
+    public bool didPressAction = false;
     /** Whether the mouse button (or touch interface) was pressed last frame */
-    private bool didMouse = false;
+    public bool didMouse = false;
     /** Whether the player bribed anyone, this frame */
-    private bool didBribeThisFrame = false;
+    public bool didBribeThisFrame = false;
 
     /** How much money the player has from bribing others */
     public int currentMoney = 0;
@@ -28,7 +30,9 @@ public class PlayerControler : PersonBrain {
         this.mouseTarget = Vector2.zero;
 
         initInstance(enType.level_0, enColor.black);
-	}
+
+        overlapping = new List<PersonBrain>();
+    }
 	
 	// Update is called once per frame
 	void Update () {
@@ -68,36 +72,62 @@ public class PlayerControler : PersonBrain {
         this.didPressAction = Input.GetButtonDown("Action");
         this.didMouse = Input.GetMouseButtonDown(0);
         this.didBribeThisFrame = false;
+
+        checkOverlap();
     }
 
     new public void OnTriggerEnter2D(Collider2D other) {
         PersonBrain otherBrain;
 
-        if (this.didBribeThisFrame) {
-            return;
-        }
-
         otherBrain = other.GetComponent<PersonBrain>();
         if (otherBrain) {
-            // Check that the player has enough money to bribe the person
-            if (this.currentMoney > otherBrain.getPrice()) {
-                // TODO Make this more precise, in case it was a button press
-                // (i.e., check that the person is in front of the player etc)
-                if (other.GetComponent<Transform>() == this.personTarget ||
-                        this.justPressedAction) {
-                    // Remove a possible bribery target
-                    this.personTarget = null;
+            this.overlapping.Add(otherBrain);
+        }
+    }
+    new public void OnTriggerExit2D(Collider2D other) {
+        PersonBrain otherBrain;
 
-                    this.currentMoney -= otherBrain.getPrice();
-                    otherBrain.doBribe();
+        otherBrain = other.GetComponent<PersonBrain>();
+        if (otherBrain && this.overlapping.Contains(otherBrain)) {
+            this.overlapping.Remove(otherBrain);
+        }
+    }
 
-                    this.didBribeThisFrame = true;
+    /**
+     * Check if any person was overlapped
+     */
+    private void checkOverlap() {
+        bool errorFlag;
+
+        errorFlag = false;
+        if (this.overlapping != null && overlapping.Count > 0) {
+            foreach (PersonBrain other in overlapping) {
+                // Check that the player has enough money to bribe the person
+                if (this.currentMoney >= other.getPrice()) {
+                    // TODO Make this more precise, in case it was a button
+                    // press (i.e., check that the person is in front of the
+                    // player etc)
+                    if (other.GetComponent<Transform>() == this.personTarget ||
+                            this.justPressedAction) {
+                        // Remove a possible bribery target
+                        this.personTarget = null;
+
+                        this.currentMoney -= other.getPrice();
+                        other.doBribe();
+
+                        return;
+                    }
+                }
+                else if (this.justPressedAction &&
+                        other.state != enState.bribed) {
+                    errorFlag = true;
                 }
             }
-            else if (this.justPressedAction) {
-                // TODO Add a sign that you can't bribe that person
-                Debug.Log("Can't bribe that person!");
-            }
+        }
+
+        if (errorFlag) {
+            // TODO Add a sign that you can't bribe that person
+            Debug.Log("Can't bribe that person!");
         }
     }
 
@@ -112,5 +142,11 @@ public class PlayerControler : PersonBrain {
         this.gameObject.SetActive(true);
 
         this.isRunningAI = true;
+    }
+
+    public void clear() {
+        if (this.overlapping != null) {
+            this.overlapping.Clear();
+        }
     }
 }

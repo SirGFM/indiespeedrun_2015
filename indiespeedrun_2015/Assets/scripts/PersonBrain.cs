@@ -61,6 +61,8 @@ public class PersonBrain : MonoBehaviour {
     public float horizontalSpeed = 3.5f;
     /** For how long influence state should run */
     public float influenceTime = 2.0f;
+    /** Maximum distance from the player */
+    public float maxDistanceFromPlayer = 0.5f;
 
     /** Current state of the person, relative to the player */
     public enState state;
@@ -195,10 +197,36 @@ public class PersonBrain : MonoBehaviour {
                 yield return new WaitForSeconds(this.influenceTime);
             } break;
             case enAIState.getBribed: {
+                this.rbody.velocity = Vector2.zero;
+                // Since both people must talk for the same amount of time they
+                // should wait for the same amount of time
+                yield return new WaitForSeconds(this.influenceTime);
 
+                this.state = enState.bribed;
             } break;
             case enAIState.follow: {
+                Transform player;
 
+                player = PersonBrain.lvlManager.player;
+                while (Vector3.Distance(player.transform.position,
+                        this.transform.position) > this.maxDistanceFromPlayer) {
+                    // Go after the player
+                    if (player.transform.position.x < this.transform.position.x &&
+                            this.rbody.velocity.x >= 0) {
+                        this.rbody.velocity = new Vector2(-this.horizontalSpeed, 0.0f);
+                        Debug.Log("Player is to my left");
+                    }
+                    else if (player.transform.position.x > this.transform.position.x &&
+                            this.rbody.velocity.x <= 0) {
+                        this.rbody.velocity = new Vector2(this.horizontalSpeed, 0.0f);
+                        Debug.Log("Player is to my right");
+                    }
+                    else {
+                        Debug.Log("Going the right direction!");
+                    }
+
+                    yield return null;
+                }
             } break;
             case enAIState.pursue: {
                 PersonBrain target;
@@ -233,8 +261,8 @@ public class PersonBrain : MonoBehaviour {
         this.runningCoroutine = null;
         
         if (this.state != enState.free) {
-            // TODO Check if the player is moving
-            if (false) {
+            if (Vector3.Distance(PersonBrain.lvlManager.player.transform.position,
+                    this.transform.position) > this.maxDistanceFromPlayer) {
                 this.aiState = enAIState.follow;
             }
             else {
@@ -357,6 +385,7 @@ public class PersonBrain : MonoBehaviour {
      * and influence
      */
     public int getPrice() {
+        // TODO If was bribed, set the price to 0x7fffffff
         return 0x7fffff;
     }
 }

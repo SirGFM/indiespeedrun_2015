@@ -18,7 +18,7 @@ public class LevelManager: MonoBehaviour {
      */
     private List<Transform> personsRecycled = null;
     /** The player */
-    private Transform player;
+    public Transform player;
 
     // Use this for initialization
     void Start () {
@@ -145,5 +145,7 @@ public class LevelManager: MonoBehaviour {
                 spawnNewPerson(PersonBrain.enType.level_0, PersonBrain.enColor.purple);
             } break;
         }
+
+        player.GetComponent<PlayerControler>().clear();
     }
 }
