@@ -3,7 +3,9 @@ using System.Collections;
 
 public class PersonBrain : MonoBehaviour {
 
-    /** Definitions of persons' types */
+    static public LevelManager lvlManager;
+
+    /** Definitions of people's types */
     public enum enType {
         level_0 = 0,
         level_1,
@@ -11,20 +13,34 @@ public class PersonBrain : MonoBehaviour {
         max
     };
 
-    /** Definitions of persons' states relative to the player */
+    /** Definitions of people's states relative to the player */
     public enum enState {
         free = 0,
         bribed,
-        persuaded,
+        influenced,
         max
     };
 
-    /** Definitions for the persons' AI states */
-    private enum enAIState {
+    /** Definitions for the people's AI states */
+    public enum enAIState {
         idle = 0,
         walk,
         talk,
         getBribed,
+        follow,
+        pursue,
+        max
+    };
+
+    /** Definitions for the people's colors (so it can be used in a switch) */
+    public enum enColor {
+        red    = 0x00000001,
+        green  = 0x00000002,
+        blue   = 0x00000004,
+        purple = 0x00000008,
+        yellow = 0x00000010,
+        white  = 0x40000000,
+        // TODO Add more colors
         max
     };
 
@@ -48,10 +64,10 @@ public class PersonBrain : MonoBehaviour {
     /** Which of the classes the instance represent */
     public enType type;
     /** This object's color */
-    public Color color;
+    public enColor color;
 
     /** Current state of the AI */
-    private enAIState aiState;
+    public enAIState aiState;
     /** Probably unneeded, but avoids calling the coroutine if it's already running */
     private bool isRunningAI;
     /** The currently running coroutine (duh!) */
@@ -87,12 +103,16 @@ public class PersonBrain : MonoBehaviour {
 
         otherBrain = other.GetComponent<PersonBrain>();
         if (otherBrain) {
-            if (otherBrain.color == this.color) {
-                Debug.Log("YAY! A friend!");
+            if (this.state == enState.bribed &&
+                    otherBrain.state == enState.free &&
+                    isFriendColor(otherBrain.color)) {
+                otherBrain.state = enState.influenced;
+                otherBrain.forceAIState(enAIState.talk);
+                forceAIState(enAIState.talk);
             }
-            // TODO Check for parent/child color etc
         }
     }
+
     public void OnTriggerExit2D(Collider2D other) {
         PersonBrain otherBrain;
 
@@ -104,6 +124,17 @@ public class PersonBrain : MonoBehaviour {
 
     private IEnumerator doAI() {
         this.isRunningAI = true;
+
+        if (this.state == enState.bribed && this.aiState != enAIState.talk) {
+            int num;
+            
+            num = PersonBrain.lvlManager.countFreeWithColor(this.color);
+
+            if (num > 0) {
+                this.aiState = enAIState.pursue;
+            }
+        }
+
         switch (aiState) {
             case enAIState.idle: {
                 float time;
@@ -159,9 +190,49 @@ public class PersonBrain : MonoBehaviour {
             case enAIState.getBribed: {
 
             } break;
+            case enAIState.follow: {
+
+            } break;
+            case enAIState.pursue: {
+                PersonBrain target;
+
+                target = PersonBrain.lvlManager.getNextInfluentiable(this.color);
+                Debug.Log("Entered pursue!");
+                
+                while (target.state == enState.free) {
+                        // Go after that person
+                        if (target.transform.position.x < this.transform.position.x &&
+                                this.rbody.velocity.x >= 0) {
+                            this.rbody.velocity = new Vector2(-this.horizontalSpeed, 0.0f);
+                            Debug.Log("Target is to my left");
+                        }
+                        else if (target.transform.position.x > this.transform.position.x &&
+                                this.rbody.velocity.x <= 0) {
+                            this.rbody.velocity = new Vector2(this.horizontalSpeed, 0.0f);
+                            Debug.Log("Target is to my right");
+                        }
+                        else {
+                            Debug.Log("Going the right direction!");
+                        }
+
+                        // Wait until this person overlap its target or the target
+                        // gets influenced/bribed by another
+                        yield return null;
+                }
+            } break;
         }
         this.isRunningAI = false;
         this.runningCoroutine = null;
+        
+        if (this.state != enState.free) {
+            // TODO Check if the player is moving
+            if (false) {
+                this.aiState = enAIState.follow;
+            }
+            else {
+                this.aiState = enAIState.idle;
+            }
+        }
     }
 
     /**
@@ -196,50 +267,79 @@ public class PersonBrain : MonoBehaviour {
     }
 
     /**
-     * Initialize the instance
+     * Initialize a interactive instance
      * 
      * @param type  The type of the person
      * @param color The color of the person
      */
-    public void initInstance(enType type, Color color) {
+    public void initInstance(enType type, enColor color) {
+        Color sprColor;
+
         // Set the instance's properties
         this.type = type;
         this.color = color;
+
+        // Make sure this person can be bribed/influenced
+        this.state = enState.free;
 
         // Always start on idle
         forceAIState(enAIState.idle);
 
         // TODO Set this only on the shirt sprite
-        GetComponent<SpriteRenderer>().color = this.color;
-
+        switch (this.color) {
+            case enColor.red: sprColor = Color.red; break;
+            case enColor.green: sprColor = Color.green; break;
+            case enColor.blue: sprColor = Color.blue; break;
+            case enColor.purple: sprColor = new Color(0.8f, 0.0f, 0.8f); break;
+            default: sprColor = Color.white; break;
+        }
+        GetComponent<SpriteRenderer>().color = sprColor;
+        
         // Randomize the position
         this.transform.position = new Vector3(Random.Range(
                 this.minHorPosition + 0.5f, this.maxHorPosition - 0.5f), 0, 0);
-
+        
+        // Activate the object's physics/behavious/etc
         this.gameObject.SetActive(true);
     }
 
     /**
-     * Return all children colors for this person
+     * Return all colors this person has influence over
      */
-    public Color[] getChildrenColor()
-    {
-        return null;
+    public bool isFriendColor(enColor color) {
+        switch (this.color) {
+            case enColor.red: return color == enColor.red;
+            case enColor.green: return color == enColor.green;
+            case enColor.blue: return color == enColor.blue;
+            case enColor.purple: return color == enColor.purple || color == enColor.red ||
+                                        color == enColor.blue;
+            // TODO Add more Colors
+            default: return false;
+        }
     }
+
     /**
-     * Return the parent of this person's color
+     * Return all colors this person has influence over
      */
-    public Color getParentColor()
-    {
-        return Color.black;
+    public bool sufferInfluence(enColor color) {
+        switch (this.color) {
+            case enColor.red: return color == enColor.red ||
+                    color == enColor.purple || color == enColor.yellow;
+            case enColor.green: return color == enColor.green ||
+                    color == enColor.yellow;
+            case enColor.blue: return color == enColor.blue ||
+                    color == enColor.purple;
+            case enColor.purple: return color == enColor.purple;
+            // TODO Add more Colors
+            default: return false;
+        }
     }
 
     /**
      * Return the price for bribing this person, according to its color, type
      * and influence
      */
-    public int getPrice()
-    {
+    public int getPrice() {
         return 0x7fffff;
     }
 }

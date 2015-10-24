@@ -20,6 +20,9 @@ public class LevelManager: MonoBehaviour {
 
     // Use this for initialization
     void Start () {
+        // Initialize the static reference to this
+        PersonBrain.lvlManager = this;
+
         personsInUse = new List<Transform>();
         personsRecycled = new List<Transform>();
 
@@ -33,6 +36,36 @@ public class LevelManager: MonoBehaviour {
 	void Update () {
 
 	}
+
+    public int countFreeWithColor(PersonBrain.enColor color) {
+        int count;
+
+        count = 0;
+        foreach (Transform item in this.personsInUse) {
+            PersonBrain brain;
+
+            brain = item.GetComponent<PersonBrain>();
+            if (brain && brain.state == PersonBrain.enState.free &&
+                    brain.sufferInfluence(color)) {
+                count++;
+            }
+        }
+
+        return count;
+    }
+
+    public PersonBrain getNextInfluentiable(PersonBrain.enColor color) {
+        foreach (Transform item in this.personsInUse) {
+            PersonBrain brain;
+
+            brain = item.GetComponent<PersonBrain>();
+            if (brain && brain.state == PersonBrain.enState.free &&
+                    brain.sufferInfluence(color)) {
+                return brain;
+            }
+        }
+        return null;
+    }
 
     /**
      * Retrieve a person either from the recycled list or spawn a new one, if
@@ -62,7 +95,7 @@ public class LevelManager: MonoBehaviour {
      * Spawn (either recycled or instantiated) a new person of the desired type
      * and color
      */
-    private bool spawnNewPerson(PersonBrain.enType type, Color color) {
+    private bool spawnNewPerson(PersonBrain.enType type, PersonBrain.enColor color) {
         Transform newPerson;
         PersonBrain personScript;
 
@@ -99,14 +132,14 @@ public class LevelManager: MonoBehaviour {
         switch (level) {
             case 0: {
                 // TODO Spawn stuff
-                spawnNewPerson(PersonBrain.enType.level_1, Color.black);
-                spawnNewPerson(PersonBrain.enType.level_2, Color.red);
+                spawnNewPerson(PersonBrain.enType.level_1, PersonBrain.enColor.green);
+                spawnNewPerson(PersonBrain.enType.level_2, PersonBrain.enColor.red);
                 } break;
             default: {
                 // TODO Spawn more stuff
-                spawnNewPerson(PersonBrain.enType.level_0, Color.green);
-                spawnNewPerson(PersonBrain.enType.level_0, Color.black);
-                spawnNewPerson(PersonBrain.enType.level_0, Color.black);
+                spawnNewPerson(PersonBrain.enType.level_0, PersonBrain.enColor.blue);
+                spawnNewPerson(PersonBrain.enType.level_0, PersonBrain.enColor.red);
+                spawnNewPerson(PersonBrain.enType.level_0, PersonBrain.enColor.purple);
             } break;
         }
     }
