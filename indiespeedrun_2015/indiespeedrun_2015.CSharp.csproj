@@ -74,8 +74,8 @@
     </ProjectReference>
   </ItemGroup>
   <ItemGroup>
-    <Compile Include="Assets\ChangeColor.cs" />
-    <Compile Include="Assets\scripts\Person.cs" />
+    <Compile Include="Assets\scripts\LevelManager.cs" />
+    <Compile Include="Assets\scripts\PersonBrain.cs" />
   </ItemGroup>
   <ItemGroup>
     <None Include="Assets\Standard Assets\Cameras\CameraGuidelines.txt" />

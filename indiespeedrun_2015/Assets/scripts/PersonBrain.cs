@@ -1,7 +1,7 @@
 ﻿using UnityEngine;
 using System.Collections;
 
-public class Person : MonoBehaviour {
+public class PersonBrain : MonoBehaviour {
 
     /** Definitions of persons' types */
     public enum enType
@@ -11,6 +11,7 @@ public class Person : MonoBehaviour {
         level_2,
         max
     };
+
     /** Definitions of persons' states relative to the player */
     public enum enState
     {
@@ -36,6 +37,14 @@ public class Person : MonoBehaviour {
 	void Update () {
 	
 	}
+
+    public void initInstance(enType type, Color color) {
+        this.type = type;
+        this.color = color;
+        // TODO Randomize the position
+        this.transform.position.Set(0, 0, 0);
+        this.gameObject.SetActive(true);
+    }
 
     /**
      * Return all children colors for this person
