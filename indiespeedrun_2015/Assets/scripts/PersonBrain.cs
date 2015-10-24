@@ -79,6 +79,7 @@ public class PersonBrain : MonoBehaviour {
     private Coroutine runningCoroutine = null;
     /** The rigid body */
     protected Rigidbody2D rbody;
+    private bool isWhite;
 
     // Use this for initialization
     void Start() {
@@ -129,6 +130,10 @@ public class PersonBrain : MonoBehaviour {
 
             if (num > 0) {
                 this.aiState = enAIState.pursue;
+            }
+            else if (!isWhite) {
+                // Gradually change the player color to white
+                StartCoroutine(fadeToWhite());
             }
         }
 
@@ -186,6 +191,11 @@ public class PersonBrain : MonoBehaviour {
                 // Since both people must talk for the same amount of time they
                 // should wait for the same amount of time
                 yield return new WaitForSeconds(this.influenceTime);
+
+                if (this.state == enState.influenced) {
+                    // Gradually change the player color to white
+                    StartCoroutine(fadeToWhite());
+                }
             } break;
             case enAIState.getBribed: {
                 this.rbody.velocity = Vector2.zero;
@@ -262,6 +272,41 @@ public class PersonBrain : MonoBehaviour {
         }
     }
 
+    private IEnumerator fadeToWhite() {
+        SpriteRenderer spr;
+        
+        isWhite = true;
+        spr = this.GetComponent<SpriteRenderer>();
+        while (spr.color != Color.white) {
+            float b = spr.color.b;
+            float g = spr.color.g;
+            float r = spr.color.r;
+
+            if (r < 1.0f) {
+                r += Time.deltaTime;
+                if (r > 1.0f) {
+                    r = 1.0f;
+                }
+            }
+            if (g < 1.0f) {
+                g += Time.deltaTime;
+                if (g > 1.0f) {
+                    g = 1.0f;
+                }
+            }
+            if (b < 1.0f) {
+                b += Time.deltaTime;
+                if (b > 1.0f) {
+                    b = 1.0f;
+                }
+            }
+
+            spr.color = new Color(r, g, b);
+
+            yield return null;
+        }
+    }
+
     /**
      * Removes the AI loop and force this to be inactive
      */
@@ -315,6 +360,7 @@ public class PersonBrain : MonoBehaviour {
 
         // Make sure this person can be bribed/influenced
         this.state = enState.free;
+        this.isWhite = false;
 
         // Always start on idle
         forceAIState(enAIState.idle);
