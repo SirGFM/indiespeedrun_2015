@@ -128,7 +128,8 @@ public class PersonBrain : MonoBehaviour {
         if (this.state == enState.bribed && this.aiState != enAIState.talk) {
             int num;
             
-            num = PersonBrain.lvlManager.countFreeWithColor(this.color);
+            num = PersonBrain.lvlManager.countFreeWithColor(this.color,
+                    this.type);
 
             if (num > 0) {
                 this.aiState = enAIState.pursue;
@@ -196,7 +197,8 @@ public class PersonBrain : MonoBehaviour {
             case enAIState.pursue: {
                 PersonBrain target;
 
-                target = PersonBrain.lvlManager.getNextInfluentiable(this.color);
+                target = PersonBrain.lvlManager.getNextInfluentiable(this.color,
+                    this.type);
                 Debug.Log("Entered pursue!");
                 
                 while (target.state == enState.free) {

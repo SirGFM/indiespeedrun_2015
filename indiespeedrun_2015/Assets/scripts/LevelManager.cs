@@ -37,7 +37,7 @@ public class LevelManager: MonoBehaviour {
 
 	}
 
-    public int countFreeWithColor(PersonBrain.enColor color) {
+    public int countFreeWithColor(PersonBrain.enColor color, PersonBrain.enType type) {
         int count;
 
         count = 0;
@@ -46,7 +46,7 @@ public class LevelManager: MonoBehaviour {
 
             brain = item.GetComponent<PersonBrain>();
             if (brain && brain.state == PersonBrain.enState.free &&
-                    brain.sufferInfluence(color)) {
+                    brain.type <= type && brain.sufferInfluence(color)) {
                 count++;
             }
         }
@@ -54,13 +54,13 @@ public class LevelManager: MonoBehaviour {
         return count;
     }
 
-    public PersonBrain getNextInfluentiable(PersonBrain.enColor color) {
+    public PersonBrain getNextInfluentiable(PersonBrain.enColor color, PersonBrain.enType type) {
         foreach (Transform item in this.personsInUse) {
             PersonBrain brain;
 
             brain = item.GetComponent<PersonBrain>();
             if (brain && brain.state == PersonBrain.enState.free &&
-                    brain.sufferInfluence(color)) {
+                    brain.type <= type && brain.sufferInfluence(color)) {
                 return brain;
             }
         }
