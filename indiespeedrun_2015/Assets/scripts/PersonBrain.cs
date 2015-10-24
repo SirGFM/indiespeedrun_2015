@@ -34,6 +34,7 @@ public class PersonBrain : MonoBehaviour {
 
     /** Definitions for the people's colors (so it can be used in a switch) */
     public enum enColor {
+        black  = 0x00000000,
         red    = 0x00000001,
         green  = 0x00000002,
         blue   = 0x00000004,
@@ -58,6 +59,8 @@ public class PersonBrain : MonoBehaviour {
     public float maxHorPosition = 10.0f;
     /** The horizontal speed */
     public float horizontalSpeed = 3.5f;
+    /** For how long influence state should run */
+    public float influenceTime = 2.0f;
 
     /** Current state of the person, relative to the player */
     public enState state;
@@ -69,11 +72,11 @@ public class PersonBrain : MonoBehaviour {
     /** Current state of the AI */
     public enAIState aiState;
     /** Probably unneeded, but avoids calling the coroutine if it's already running */
-    private bool isRunningAI;
+    protected bool isRunningAI;
     /** The currently running coroutine (duh!) */
     private Coroutine runningCoroutine = null;
     /** The rigid body */
-    private Rigidbody2D rbody;
+    protected Rigidbody2D rbody;
 
     // Use this for initialization
     void Start() {
@@ -186,7 +189,10 @@ public class PersonBrain : MonoBehaviour {
                 this.aiState = enAIState.idle;
              } break;
             case enAIState.talk: {
-
+                this.rbody.velocity = Vector2.zero;
+                // Since both people must talk for the same amount of time they
+                // should wait for the same amount of time
+                yield return new WaitForSeconds(this.influenceTime);
             } break;
             case enAIState.getBribed: {
 
@@ -202,24 +208,24 @@ public class PersonBrain : MonoBehaviour {
                 Debug.Log("Entered pursue!");
                 
                 while (target.state == enState.free) {
-                        // Go after that person
-                        if (target.transform.position.x < this.transform.position.x &&
-                                this.rbody.velocity.x >= 0) {
-                            this.rbody.velocity = new Vector2(-this.horizontalSpeed, 0.0f);
-                            Debug.Log("Target is to my left");
-                        }
-                        else if (target.transform.position.x > this.transform.position.x &&
-                                this.rbody.velocity.x <= 0) {
-                            this.rbody.velocity = new Vector2(this.horizontalSpeed, 0.0f);
-                            Debug.Log("Target is to my right");
-                        }
-                        else {
-                            Debug.Log("Going the right direction!");
-                        }
+                    // Go after that person
+                    if (target.transform.position.x < this.transform.position.x &&
+                            this.rbody.velocity.x >= 0) {
+                        this.rbody.velocity = new Vector2(-this.horizontalSpeed, 0.0f);
+                        Debug.Log("Target is to my left");
+                    }
+                    else if (target.transform.position.x > this.transform.position.x &&
+                            this.rbody.velocity.x <= 0) {
+                        this.rbody.velocity = new Vector2(this.horizontalSpeed, 0.0f);
+                        Debug.Log("Target is to my right");
+                    }
+                    else {
+                        Debug.Log("Going the right direction!");
+                    }
 
-                        // Wait until this person overlap its target or the target
-                        // gets influenced/bribed by another
-                        yield return null;
+                    // Wait until this person overlap its target or the target
+                    // gets influenced/bribed by another
+                    yield return null;
                 }
             } break;
         }
@@ -254,9 +260,16 @@ public class PersonBrain : MonoBehaviour {
     }
 
     /**
+     * Bribe that person
+     */
+    public void doBribe() {
+        forceAIState(enAIState.getBribed);
+    }
+
+    /**
      * Force this person to switch its state
      */
-    private void forceAIState(enAIState aiState) {
+    protected void forceAIState(enAIState aiState) {
         // Enable the next coroutine to start
         this.isRunningAI = false;
         // Switch the state
@@ -274,7 +287,7 @@ public class PersonBrain : MonoBehaviour {
      * @param type  The type of the person
      * @param color The color of the person
      */
-    public void initInstance(enType type, enColor color) {
+    virtual public void initInstance(enType type, enColor color) {
         Color sprColor;
 
         // Set the instance's properties
@@ -289,10 +302,12 @@ public class PersonBrain : MonoBehaviour {
 
         // TODO Set this only on the shirt sprite
         switch (this.color) {
+            case enColor.black: sprColor = Color.black; break;
             case enColor.red: sprColor = Color.red; break;
             case enColor.green: sprColor = Color.green; break;
             case enColor.blue: sprColor = Color.blue; break;
             case enColor.purple: sprColor = new Color(0.8f, 0.0f, 0.8f); break;
+            case enColor.yellow: sprColor = Color.yellow; break;
             default: sprColor = Color.white; break;
         }
         GetComponent<SpriteRenderer>().color = sprColor;

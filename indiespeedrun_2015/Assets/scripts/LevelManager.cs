@@ -17,6 +17,8 @@ public class LevelManager: MonoBehaviour {
      * level
      */
     private List<Transform> personsRecycled = null;
+    /** The player */
+    private Transform player;
 
     // Use this for initialization
     void Start () {
@@ -26,7 +28,8 @@ public class LevelManager: MonoBehaviour {
         personsInUse = new List<Transform>();
         personsRecycled = new List<Transform>();
 
-        // TODO Spawn player!
+        // Spawn player
+        player = Instantiate(playerPrefab);
 
         curLevel = -1;
         startLevel(curLevel);
