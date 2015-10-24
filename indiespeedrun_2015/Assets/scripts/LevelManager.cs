@@ -3,17 +3,27 @@ using System.Collections.Generic;
 
 public class LevelManager: MonoBehaviour {
 
+    /** Default prefab used to spawn persons */
     public Transform personPrefab = null;
-    public List<Transform> personsInUse = null;
-    public List<Transform> personsRecycled = null;
+    /** Player prefab, to be spawned right (and only) at the start of the game */
+    public Transform playerPrefab = null;
 
+    /** Store the current level, should be increased on level transition */
     public int curLevel;
-    private bool wasDown = false;
+    /** List of currently active persons in the level */
+    private List<Transform> personsInUse = null;
+    /**
+     * List of currently inactive persons that may be recycled on the next
+     * level
+     */
+    private List<Transform> personsRecycled = null;
 
     // Use this for initialization
     void Start () {
         personsInUse = new List<Transform>();
         personsRecycled = new List<Transform>();
+
+        // TODO Spawn player!
 
         curLevel = -1;
         startLevel(curLevel);
@@ -21,11 +31,7 @@ public class LevelManager: MonoBehaviour {
 	
 	// Update is called once per frame
 	void Update () {
-        if (!wasDown && Input.anyKeyDown) {
-            curLevel++;
-            startLevel(curLevel);
-        }
-        wasDown = Input.anyKeyDown;
+
 	}
 
     /**

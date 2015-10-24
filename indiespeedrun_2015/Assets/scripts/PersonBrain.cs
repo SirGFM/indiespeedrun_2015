@@ -21,12 +21,22 @@ public class PersonBrain : MonoBehaviour {
         max
     };
 
+    /** Definitions for the persons' AI states */
+    private enum enAIState {
+        idle = 0,
+        walk,
+        talk,
+        getBribed,
+        max
+    };
+
     /** Current state of the person, relative to the player */
     public enState state;
     /** Which of the classes the instance represent */
     public enType type;
     /** This object's color */
     public Color color;
+    private enAIState aiState;
 
 	// Use this for initialization
 	void Start () {
@@ -35,7 +45,7 @@ public class PersonBrain : MonoBehaviour {
 	
 	// Update is called once per frame
 	void Update () {
-	
+	    // TODO Set a
 	}
 
     public void initInstance(enType type, Color color) {
