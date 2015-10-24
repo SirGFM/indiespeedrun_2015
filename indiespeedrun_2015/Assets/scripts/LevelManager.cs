@@ -91,7 +91,7 @@ public class LevelManager: MonoBehaviour {
         // Add all items previously in use to the recycled list
         foreach (Transform item in personsInUse) {
             personsRecycled.Add(item);
-            item.gameObject.SetActive(false);
+            item.GetComponent<PersonBrain>().forceStop();
         }
         personsInUse.Clear();
 
@@ -104,7 +104,9 @@ public class LevelManager: MonoBehaviour {
                 } break;
             default: {
                 // TODO Spawn more stuff
-                spawnNewPerson(PersonBrain.enType.level_0, Color.blue);
+                spawnNewPerson(PersonBrain.enType.level_0, Color.green);
+                spawnNewPerson(PersonBrain.enType.level_0, Color.black);
+                spawnNewPerson(PersonBrain.enType.level_0, Color.black);
             } break;
         }
     }

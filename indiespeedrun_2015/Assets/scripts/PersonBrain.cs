@@ -76,10 +76,31 @@ public class PersonBrain : MonoBehaviour {
             this.rbody.velocity = new Vector2(-this.horizontalSpeed, 0.0f);
         }
 
+        // Reactivate the AI, if it has finished running
         if (!isRunningAI) {
             this.runningCoroutine = StartCoroutine(doAI());
         }
-	}
+    }
+
+    public void OnTriggerEnter2D(Collider2D other) {
+        PersonBrain otherBrain;
+
+        otherBrain = other.GetComponent<PersonBrain>();
+        if (otherBrain) {
+            if (otherBrain.color == this.color) {
+                Debug.Log("YAY! A friend!");
+            }
+            // TODO Check for parent/child color etc
+        }
+    }
+    public void OnTriggerExit2D(Collider2D other) {
+        PersonBrain otherBrain;
+
+        otherBrain = other.GetComponent<PersonBrain>();
+        if (otherBrain) {
+            // TODO Check for parent/child color etc
+        }
+    }
 
     private IEnumerator doAI() {
         this.isRunningAI = true;
@@ -144,6 +165,22 @@ public class PersonBrain : MonoBehaviour {
     }
 
     /**
+     * Removes the AI loop and force this to be inactive
+     */
+    public void forceStop() {
+        // Enable the next coroutine to start
+        this.isRunningAI = false;
+        // Switch the state to idle
+        this.aiState = enAIState.idle;
+        // Stop the current coroutine
+        if (this.runningCoroutine != null) {
+            StopCoroutine(this.runningCoroutine);
+        }
+        this.runningCoroutine = null;
+        this.gameObject.SetActive(false);
+    }
+
+    /**
      * Force this person to switch its state
      */
     private void forceAIState(enAIState aiState) {
@@ -175,8 +212,9 @@ public class PersonBrain : MonoBehaviour {
         // TODO Set this only on the shirt sprite
         GetComponent<SpriteRenderer>().color = this.color;
 
-        // TODO Randomize the position
-        this.transform.position.Set(0, 0, 0);
+        // Randomize the position
+        this.transform.position = new Vector3(Random.Range(
+                this.minHorPosition + 0.5f, this.maxHorPosition - 0.5f), 0, 0);
 
         this.gameObject.SetActive(true);
     }
