@@ -140,9 +140,19 @@ public class LevelManager: MonoBehaviour {
                 } break;
             default: {
                 // TODO Spawn more stuff
-                spawnNewPerson(PersonBrain.enType.level_0, PersonBrain.enColor.blue);
-                spawnNewPerson(PersonBrain.enType.level_0, PersonBrain.enColor.red);
-                spawnNewPerson(PersonBrain.enType.level_0, PersonBrain.enColor.purple);
+                spawnNewPerson(PersonBrain.enType.level_0, PersonBrain.enColor.magenta);
+                spawnNewPerson(PersonBrain.enType.level_0, PersonBrain.enColor.magenta);
+                spawnNewPerson(PersonBrain.enType.level_0, PersonBrain.enColor.cyan);
+                spawnNewPerson(PersonBrain.enType.level_0, PersonBrain.enColor.cyan);
+                spawnNewPerson(PersonBrain.enType.level_0, PersonBrain.enColor.yellow);
+                spawnNewPerson(PersonBrain.enType.level_0, PersonBrain.enColor.yellow);
+                spawnNewPerson(PersonBrain.enType.level_1, PersonBrain.enColor.red);
+                spawnNewPerson(PersonBrain.enType.level_1, PersonBrain.enColor.red);
+                spawnNewPerson(PersonBrain.enType.level_1, PersonBrain.enColor.blue);
+                spawnNewPerson(PersonBrain.enType.level_1, PersonBrain.enColor.blue);
+                spawnNewPerson(PersonBrain.enType.level_1, PersonBrain.enColor.green);
+                spawnNewPerson(PersonBrain.enType.level_1, PersonBrain.enColor.green);
+                spawnNewPerson(PersonBrain.enType.level_2, PersonBrain.enColor.black);
             } break;
         }
 

@@ -34,14 +34,14 @@ public class PersonBrain : MonoBehaviour {
 
     /** Definitions for the people's colors (so it can be used in a switch) */
     public enum enColor {
-        black  = 0x00000000,
-        red    = 0x00000001,
-        green  = 0x00000002,
-        blue   = 0x00000004,
-        purple = 0x00000008,
-        yellow = 0x00000010,
-        white  = 0x40000000,
-        // TODO Add more colors
+        white   = 0x00000000,
+        red     = 0x00000001,
+        green   = 0x00000002,
+        blue    = 0x00000004,
+        magenta = 0x00000010,
+        cyan    = 0x00000020,
+        yellow  = 0x00000040,
+        black   = 0x00000100,
         max
     };
 
@@ -115,15 +115,6 @@ public class PersonBrain : MonoBehaviour {
                 otherBrain.forceAIState(enAIState.talk);
                 forceAIState(enAIState.talk);
             }
-        }
-    }
-
-    public void OnTriggerExit2D(Collider2D other) {
-        PersonBrain otherBrain;
-
-        otherBrain = other.GetComponent<PersonBrain>();
-        if (otherBrain) {
-            // TODO Check for parent/child color etc
         }
     }
 
@@ -316,7 +307,7 @@ public class PersonBrain : MonoBehaviour {
      * @param color The color of the person
      */
     virtual public void initInstance(enType type, enColor color) {
-        Color sprColor;
+        Color32 c32;
 
         // Set the instance's properties
         this.type = type;
@@ -330,15 +321,18 @@ public class PersonBrain : MonoBehaviour {
 
         // TODO Set this only on the shirt sprite
         switch (this.color) {
-            case enColor.black: sprColor = Color.black; break;
-            case enColor.red: sprColor = Color.red; break;
-            case enColor.green: sprColor = Color.green; break;
-            case enColor.blue: sprColor = Color.blue; break;
-            case enColor.purple: sprColor = new Color(0.8f, 0.0f, 0.8f); break;
-            case enColor.yellow: sprColor = Color.yellow; break;
-            default: sprColor = Color.white; break;
+            case enColor.red:     c32 = new Color32(0xed, 0x6a, 0x6a, 0xff); break;
+            case enColor.green:   c32 = new Color32(0x3e, 0xb7, 0x79, 0xff); break;
+            case enColor.blue:    c32 = new Color32(0x54, 0x57, 0x9e, 0xff); break;
+            case enColor.magenta: c32 = new Color32(0xda, 0x71, 0xb0, 0xff); break;
+            case enColor.cyan:    c32 = new Color32(0x69, 0xb6, 0xd3, 0xff); break;
+            case enColor.yellow:  c32 = new Color32(0xe1, 0xda, 0x4f, 0xff); break;
+            case enColor.black:   c32 = new Color32(0x00, 0x00, 0x00, 0xff); break;
+            case enColor.white:   c32 = new Color32(0xff, 0xff, 0xff, 0xff); break;
+            default:              c32 = new Color32(0xff, 0xff, 0xff, 0xff); break;
         }
-        GetComponent<SpriteRenderer>().color = sprColor;
+        GetComponent<SpriteRenderer>().color = new Color((float)c32.r / 255.0f,
+                (float)c32.g / 255.0f, (float)c32.b / 255.0f);
         
         // Randomize the position
         this.transform.position = new Vector3(Random.Range(
@@ -353,12 +347,16 @@ public class PersonBrain : MonoBehaviour {
      */
     public bool isFriendColor(enColor color) {
         switch (this.color) {
-            case enColor.red: return color == enColor.red;
-            case enColor.green: return color == enColor.green;
-            case enColor.blue: return color == enColor.blue;
-            case enColor.purple: return color == enColor.purple || color == enColor.red ||
-                                        color == enColor.blue;
-            // TODO Add more Colors
+            case enColor.magenta: return color == enColor.magenta;
+            case enColor.cyan: return color == enColor.cyan;
+            case enColor.yellow: return color == enColor.yellow;
+            case enColor.red: return color == enColor.red ||
+                    color == enColor.magenta || color == enColor.yellow;
+            case enColor.green: return color == enColor.green ||
+                    color == enColor.yellow || color == enColor.cyan;
+            case enColor.blue: return color == enColor.blue ||
+                    color == enColor.cyan || color == enColor.magenta;
+            case enColor.black: return true;
             default: return false;
         }
     }
@@ -368,14 +366,22 @@ public class PersonBrain : MonoBehaviour {
      */
     public bool sufferInfluence(enColor color) {
         switch (this.color) {
+            case enColor.magenta: return color == enColor.magenta ||
+                    color == enColor.red || color == enColor.blue ||
+                    color == enColor.black;
+            case enColor.cyan: return color == enColor.cyan ||
+                    color == enColor.blue || color == enColor.green ||
+                    color == enColor.black;
+            case enColor.yellow: return color == enColor.yellow ||
+                    color == enColor.green || color == enColor.red ||
+                    color == enColor.black;
             case enColor.red: return color == enColor.red ||
-                    color == enColor.purple || color == enColor.yellow;
+                    color == enColor.black;
             case enColor.green: return color == enColor.green ||
-                    color == enColor.yellow;
+                    color == enColor.black;
             case enColor.blue: return color == enColor.blue ||
-                    color == enColor.purple;
-            case enColor.purple: return color == enColor.purple;
-            // TODO Add more Colors
+                    color == enColor.black;
+            case enColor.black: return color == enColor.black;
             default: return false;
         }
     }
@@ -386,6 +392,17 @@ public class PersonBrain : MonoBehaviour {
      */
     public int getPrice() {
         // TODO If was bribed, set the price to 0x7fffffff
-        return 0x7fffff;
+        if (this.state == enState.bribed) {
+            return 0x7fffffff;
+        }
+        else {
+            switch (this.type) {
+                // TODO Define the prices
+                case enType.level_0: return 2;
+                case enType.level_1: return 4;
+                case enType.level_2: return 8;
+                default: return 0x7fffffff;
+            }
+        }
     }
 }

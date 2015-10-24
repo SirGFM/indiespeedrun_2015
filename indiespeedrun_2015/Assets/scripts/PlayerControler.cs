@@ -29,7 +29,7 @@ public class PlayerControler : PersonBrain {
         this.rbody = this.GetComponent<Rigidbody2D>();
         this.mouseTarget = Vector2.zero;
 
-        initInstance(enType.level_0, enColor.black);
+        initInstance(enType.level_0, enColor.white);
 
         overlapping = new List<PersonBrain>();
     }
@@ -84,7 +84,7 @@ public class PlayerControler : PersonBrain {
             this.overlapping.Add(otherBrain);
         }
     }
-    new public void OnTriggerExit2D(Collider2D other) {
+    public void OnTriggerExit2D(Collider2D other) {
         PersonBrain otherBrain;
 
         otherBrain = other.GetComponent<PersonBrain>();
