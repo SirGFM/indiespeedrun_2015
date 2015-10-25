@@ -91,7 +91,7 @@ public class PersonBrain : MonoBehaviour {
     protected Rigidbody2D rbody;
     private bool isWhite;
     private SpriteRenderer sprBody;
-    private FixLayer fixLayer;
+    protected FixLayer fixLayer;
 
     // Use this for initialization
     void Start() {
@@ -397,7 +397,7 @@ public class PersonBrain : MonoBehaviour {
      * @param type  The type of the person
      * @param color The color of the person
      */
-    virtual public void initInstance(enType type, enColor color) {
+    virtual public void initInstance(enType type, enColor color, bool isPlayer = false) {
         Color32 c32;
 
         // Set the instance's properties
@@ -415,7 +415,7 @@ public class PersonBrain : MonoBehaviour {
         this.sprBody = null;
         this.fixLayer = this.GetComponentInChildren<FixLayer>();
         if (this.fixLayer != null) {
-            this.fixLayer.fixLayer(this);
+            this.fixLayer.fixLayer(this, isPlayer);
             this.sprBody = this.fixLayer.getBody();
         }
         

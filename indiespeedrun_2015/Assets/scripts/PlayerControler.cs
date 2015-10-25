@@ -30,11 +30,12 @@ public class PlayerControler : PersonBrain {
         this.rbody = this.GetComponent<Rigidbody2D>();
         this.mouseTarget = Vector2.zero;
 
-        initInstance(enType.level_0, enColor.white);
+        initInstance(enType.level_0, enColor.white, true);
 
         this.overlapping = new List<PersonBrain>();
+        this.fixLayer = this.GetComponentInChildren<FixLayer>();
 
-        this.GetComponent<SpriteRenderer>().sortingOrder = 20;
+        //this.GetComponent<SpriteRenderer>().sortingOrder = 20;
     }
 	
 	// Update is called once per frame
@@ -111,11 +112,11 @@ public class PlayerControler : PersonBrain {
         checkOverlap();
         
         if (this.dir != enDir.left && this.rbody.velocity.x < 0) {
-            this.fixLayer.moveLeft();
+            this.fixLayer.moveRight();
             this.dir = enDir.left;
         }
         else if (this.dir != enDir.right && this.rbody.velocity.x > 0) {
-            this.fixLayer.moveRight();
+            this.fixLayer.moveLeft();
             this.dir = enDir.right;
         }
     }
@@ -179,7 +180,7 @@ public class PlayerControler : PersonBrain {
         }
     }
 
-    override public void initInstance(enType type, enColor color) {
+    override public void initInstance(enType type, enColor color, bool isPlayer = false) {
         base.initInstance(type, color);
 
         // The player position is always static, so set it

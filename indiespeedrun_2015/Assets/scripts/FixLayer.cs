@@ -6,7 +6,7 @@ public class FixLayer : MonoBehaviour {
     public SpriteRenderer head, neck = null, rfarm, rarm, lfarm, larm, body,
             rfoot, rleg, rcalf, lfoot, lleg, lcalf;
     
-    public void fixLayer(PersonBrain self) {
+    public void fixLayer(PersonBrain self, bool isPlayer) {
         int init;    
 
         switch (self.type) {
@@ -18,9 +18,12 @@ public class FixLayer : MonoBehaviour {
             default: init = -20; break;
         }
 
+        if (isPlayer) {
+            init = 60;
+        }
+
         this.head.sortingOrder = init - 2;
         if (this.neck != null) {
-            // TODO Check the neck's layer
             this.neck.sortingOrder = init - 2;
         }
         this.rfarm.sortingOrder = init + 0;
@@ -41,10 +44,16 @@ public class FixLayer : MonoBehaviour {
     }
 
     public void moveLeft() {
-        this.transform.localScale = new Vector3(0.8f, 0.8f);
+        float scale;
+
+        scale = Mathf.Abs(this.transform.localScale.x);
+        this.transform.localScale = new Vector3(scale, scale);
     }
 
     public void moveRight() {
-        this.transform.localScale = new Vector3(-0.8f, 0.8f);
+        float scale;
+
+        scale = Mathf.Abs(this.transform.localScale.x);
+        this.transform.localScale = new Vector3(-scale, scale);
     }
 }
