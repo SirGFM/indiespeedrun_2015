@@ -204,4 +204,9 @@ public class PlayerControler : PersonBrain {
         // Reset the amount of money
         this.currentMoney = initialMoney;
     }
+
+    public void advanceType() {
+        this.type++;
+        this.GetComponentInChildren<CharCostumeController>().ChangeLevel((int)this.type);
+    }
 }

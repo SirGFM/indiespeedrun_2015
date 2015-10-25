@@ -13,7 +13,7 @@ public class LevelManager: MonoBehaviour {
 
     /** Store the current level, should be increased on level transition */
     static public int curLevel = 0;
-    public int lastLevel = 2;
+    public int lastLevel = 3;
     /** The player */
     public Transform player;
     /** Current width of the level */
@@ -37,6 +37,9 @@ public class LevelManager: MonoBehaviour {
 
     public Canvas canvas;
     public Text requiredPeople;
+
+    public AudioClip secondSong;
+    public AudioClip thirdSong;
 
     /** List of currently active persons in the level */
     private List<Transform> personsInUse = null;
@@ -66,8 +69,18 @@ public class LevelManager: MonoBehaviour {
     /** How many people has been bribed through the levels */
     public int accBribed = 0;
 
+
+    private SoundController sc;
+    private AudioSource audSrc;
+
+    public void goBack() {
+        Application.LoadLevel(0);
+    }
+
     // Use this for initialization
     void Start () {
+
+        GameObject go;
         // Initialize the static reference to this
         PersonBrain.lvlManager = this;
 
@@ -81,7 +94,16 @@ public class LevelManager: MonoBehaviour {
         player = Instantiate(playerPrefab);
         plCtrl = player.GetComponent<PlayerControler>();
 
-        curLevel = 0;
+        go = GameObject.Find("MainAudioController");
+        if (go != null) {
+
+            sc = go.GetComponent<SoundController>();
+            if (sc != null) {
+
+                audSrc = go.GetComponent<AudioSource>();
+            }
+        }
+
         startLevel(curLevel);
     }
 	
@@ -372,8 +394,8 @@ public class LevelManager: MonoBehaviour {
             // TODO Create the actual levels!!!
             case 0: {
                 width = 3;
-                initialMoney = 4;
-                targetFollowers = 5;
+                initialMoney = 2;
+                targetFollowers = 3;
                 people = new PersonBrain.enColor[] {
                         PersonBrain.enColor.magenta,
                         PersonBrain.enColor.magenta,
@@ -384,12 +406,60 @@ public class LevelManager: MonoBehaviour {
                     };
             } break;
             case 1: {
-                width = 3;
+                width = 9;
                 initialMoney = 4;
-                targetFollowers = 3;
+                targetFollowers = 12;
+                this.plCtrl.advanceType();
+                sc.PlayLoop(secondSong, audSrc);
                 people = new PersonBrain.enColor[] {
                         PersonBrain.enColor.magenta,
+                        PersonBrain.enColor.magenta,
+                        PersonBrain.enColor.magenta,
+                        PersonBrain.enColor.magenta,
+                        PersonBrain.enColor.cyan,
+                        PersonBrain.enColor.cyan,
+                        PersonBrain.enColor.cyan,
+                        PersonBrain.enColor.cyan,
+                        PersonBrain.enColor.cyan,
+                        PersonBrain.enColor.cyan,
+                        PersonBrain.enColor.cyan,
+                        PersonBrain.enColor.yellow,
+                        PersonBrain.enColor.yellow,
+                        PersonBrain.enColor.yellow,
+                        PersonBrain.enColor.yellow,
                         PersonBrain.enColor.yellow
+                    };
+            } break;
+            case 2: {
+                width = 11;
+                initialMoney = 4;
+                targetFollowers = 16;
+                sc.PlayLoop(thirdSong, audSrc);
+                this.plCtrl.advanceType();
+                people = new PersonBrain.enColor[] {
+                        PersonBrain.enColor.magenta,
+                        PersonBrain.enColor.magenta,
+                        PersonBrain.enColor.magenta,
+                        PersonBrain.enColor.magenta,
+                        PersonBrain.enColor.magenta,
+                        PersonBrain.enColor.magenta,
+                        PersonBrain.enColor.cyan,
+                        PersonBrain.enColor.cyan,
+                        PersonBrain.enColor.cyan,
+                        PersonBrain.enColor.cyan,
+                        PersonBrain.enColor.cyan,
+                        PersonBrain.enColor.yellow,
+                        PersonBrain.enColor.yellow,
+                        PersonBrain.enColor.yellow,
+                        PersonBrain.enColor.yellow,
+                        PersonBrain.enColor.yellow,
+                        PersonBrain.enColor.yellow,
+                        PersonBrain.enColor.yellow,
+                        PersonBrain.enColor.yellow,
+                        PersonBrain.enColor.yellow,
+                        PersonBrain.enColor.red,
+                        PersonBrain.enColor.green,
+                        PersonBrain.enColor.blue
                     };
             } break;
             default: {

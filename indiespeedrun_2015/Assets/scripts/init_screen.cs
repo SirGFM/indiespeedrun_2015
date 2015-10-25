@@ -5,13 +5,32 @@ public class init_screen : MonoBehaviour {
 
     private bool didFinish;
 
+    public AudioClip firstSong;
+
     public Transform credits;
     public SpriteRenderer creditsSpr;
 
     // Use this for initialization
     void Start() {
+        GameObject go;
+
         creditsSpr = credits.GetComponent<SpriteRenderer>();
         creditsSpr.color = new Color(1f, 1f, 1f, 0f);
+
+        go = GameObject.Find("MainAudioController");
+        if (go != null) {
+            SoundController sc;
+
+            sc = go.GetComponent<SoundController>();
+            if (sc != null) {
+                AudioSource audSrc;
+
+                audSrc = go.GetComponent<AudioSource>();
+                if (audSrc) {
+                    sc.PlayLoop(firstSong, audSrc);
+                }
+            }
+        }
     }
 
     // Update is called once per frame
