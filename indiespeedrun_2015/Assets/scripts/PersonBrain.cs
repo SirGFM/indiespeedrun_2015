@@ -45,6 +45,11 @@ public class PersonBrain : MonoBehaviour {
         max
     };
 
+    /** Leftmost position the person can go to */
+    static public float minHorPosition = -10.0f;
+    /** Rightmost position the person can go to */
+    static public float maxHorPosition = 10.0f;
+
     /** Minimum time the person will stand still if idle */
     public float minIdleTime = 0.5f;
     /** Maximum time the person will stand still if idle */
@@ -53,10 +58,6 @@ public class PersonBrain : MonoBehaviour {
     public float minWalkTime = 2.0f;
     /** Maximum time the person will walk */
     public float maxWalkTime = 5.0f;
-    /** Leftmost position the person can go to */
-    public float minHorPosition = -10.0f;
-    /** Rightmost position the person can go to */
-    public float maxHorPosition = 10.0f;
     /** The horizontal speed */
     public float horizontalSpeed = 3.5f;
     /** For how long influence state should run */
@@ -91,10 +92,10 @@ public class PersonBrain : MonoBehaviour {
         // TODO Set the animation according with the state
 
         // Forcibly reverse the velocity, if going out of bounds
-        if (this.transform.position.x <= this.minHorPosition) {
+        if (this.transform.position.x <= PersonBrain.minHorPosition) {
             this.rbody.velocity = new Vector2(this.horizontalSpeed, 0.0f);
         }
-        else if (this.transform.position.x >= this.maxHorPosition) {
+        else if (this.transform.position.x >= PersonBrain.maxHorPosition) {
             this.rbody.velocity = new Vector2(-this.horizontalSpeed, 0.0f);
         }
 
@@ -164,10 +165,10 @@ public class PersonBrain : MonoBehaviour {
                 time = Random.Range(minWalkTime, maxWalkTime);
 
                 // Set speed
-                if (this.transform.position.x <= this.minHorPosition) {
+                if (this.transform.position.x <= PersonBrain.minHorPosition) {
                     this.rbody.velocity = new Vector2(this.horizontalSpeed, 0.0f);
                 }
-                else if (this.transform.position.x >= this.maxHorPosition) {
+                else if (this.transform.position.x >= PersonBrain.maxHorPosition) {
                     this.rbody.velocity = new Vector2(-this.horizontalSpeed, 0.0f);
                 }
                 else if (Random.Range(0, 1) == 0) {
@@ -353,6 +354,7 @@ public class PersonBrain : MonoBehaviour {
      */
     virtual public void initInstance(enType type, enColor color) {
         Color32 c32;
+        SpriteRenderer spr;
 
         // Set the instance's properties
         this.type = type;
@@ -364,6 +366,19 @@ public class PersonBrain : MonoBehaviour {
 
         // Always start on idle
         forceAIState(enAIState.idle);
+
+        spr = GetComponent<SpriteRenderer>();
+        switch (type) {
+            case enType.level_0: {
+                spr.sortingOrder = 5;
+            } break;
+            case enType.level_1: {
+                spr.sortingOrder = 6;
+            } break;
+            case enType.level_2: {
+                spr.sortingOrder = 7;
+            } break;
+        }
 
         // TODO Set this only on the shirt sprite
         switch (this.color) {
@@ -377,12 +392,13 @@ public class PersonBrain : MonoBehaviour {
             case enColor.white:   c32 = new Color32(0xff, 0xff, 0xff, 0xff); break;
             default:              c32 = new Color32(0xff, 0xff, 0xff, 0xff); break;
         }
-        GetComponent<SpriteRenderer>().color = new Color((float)c32.r / 255.0f,
-                (float)c32.g / 255.0f, (float)c32.b / 255.0f);
+        spr.color = new Color((float)c32.r / 255.0f, (float)c32.g / 255.0f,
+                (float)c32.b / 255.0f);
         
         // Randomize the position
         this.transform.position = new Vector3(Random.Range(
-                this.minHorPosition + 0.5f, this.maxHorPosition - 0.5f), 0, 0);
+                PersonBrain.minHorPosition + 0.5f,
+                PersonBrain.maxHorPosition - 0.5f), 0, 0);
         
         // Activate the object's physics/behavious/etc
         this.gameObject.SetActive(true);
@@ -437,7 +453,6 @@ public class PersonBrain : MonoBehaviour {
      * and influence
      */
     public int getPrice() {
-        // TODO If was bribed, set the price to 0x7fffffff
         if (this.state == enState.bribed) {
             return 0x7fffffff;
         }

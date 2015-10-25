@@ -31,7 +31,9 @@ public class PlayerControler : PersonBrain {
 
         initInstance(enType.level_0, enColor.white);
 
-        overlapping = new List<PersonBrain>();
+        this.overlapping = new List<PersonBrain>();
+
+        this.GetComponent<SpriteRenderer>().sortingOrder = 20;
     }
 	
 	// Update is called once per frame
@@ -67,7 +69,22 @@ public class PlayerControler : PersonBrain {
             this.rbody.velocity = Vector2.zero;
         }
         // TODO Add touch?
-        
+
+        if (this.transform.position.x < PersonBrain.minHorPosition) {
+            this.transform.position = new Vector3(PersonBrain.minHorPosition,
+                    0.0f, 0.0f);
+            if (this.rbody.velocity.x < 0) {
+                this.rbody.velocity = Vector3.zero;
+            }
+        }
+        else if (this.transform.position.x > PersonBrain.maxHorPosition) {
+            this.transform.position = new Vector3(PersonBrain.maxHorPosition,
+                    0.0f, 0.0f);
+            if (this.rbody.velocity.x > 0) {
+                this.rbody.velocity = Vector3.zero;
+            }
+        }
+
         this.justPressedAction = !this.didPressAction && Input.GetButtonDown("Action");
         this.didPressAction = Input.GetButtonDown("Action");
         this.didMouse = Input.GetMouseButtonDown(0);
@@ -135,7 +152,7 @@ public class PlayerControler : PersonBrain {
         base.initInstance(type, color);
 
         // The player position is always static, so set it
-        this.transform.position = new Vector3(this.minHorPosition, 0.0f, 0.0f);
+        this.transform.position = new Vector3(PersonBrain.minHorPosition, 0.0f, 0.0f);
 
         forceStop();
 
