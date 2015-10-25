@@ -93,9 +93,12 @@ public class PersonBrain : MonoBehaviour {
     private SpriteRenderer sprBody;
     protected FixLayer fixLayer;
 
+    private Animator animator;
+
     // Use this for initialization
     void Start() {
         this.rbody = GetComponent<Rigidbody2D>();
+        animator = GetComponentInChildren<Animator>();
     }
 
     // Update is called once per frame
@@ -167,6 +170,7 @@ public class PersonBrain : MonoBehaviour {
                 time = Random.Range(minIdleTime, maxIdleTime);
 
                 Debug.Log("Idle for " + time.ToString() + "s");
+                animator.SetFloat("MovBlend", 0);
                 yield return new WaitForSeconds(time);
                 Debug.Log("Exiting idle!");
 
@@ -210,6 +214,7 @@ public class PersonBrain : MonoBehaviour {
                 }
 
                 Debug.Log("Walking for " + time.ToString() + "s");
+                animator.SetFloat("MovBlend", 1);
                 yield return new WaitForSeconds(time);
                 Debug.Log("Exiting walk!");
 
@@ -222,6 +227,8 @@ public class PersonBrain : MonoBehaviour {
                 this.rbody.velocity = Vector2.zero;
                 // Since both people must talk for the same amount of time they
                 // should wait for the same amount of time
+                
+                animator.SetTrigger("Bribe");
                 yield return new WaitForSeconds(this.influenceTime);
 
                 if (this.state == enState.influenced) {
@@ -233,6 +240,8 @@ public class PersonBrain : MonoBehaviour {
                 this.rbody.velocity = Vector2.zero;
                 // Since both people must talk for the same amount of time they
                 // should wait for the same amount of time
+
+                animator.SetTrigger("Bribe");
                 yield return new WaitForSeconds(this.influenceTime);
 
                 this.state = enState.bribed;
@@ -243,6 +252,7 @@ public class PersonBrain : MonoBehaviour {
                 Transform player;
 
                 player = PersonBrain.lvlManager.player;
+                animator.SetFloat("MovBlend", 1);
                 while (Vector3.Distance(player.transform.position,
                         this.transform.position) > this.maxDistanceFromPlayer) {
                     // Go after the player

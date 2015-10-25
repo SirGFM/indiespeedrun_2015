@@ -24,6 +24,9 @@ public class PlayerControler : PersonBrain {
 
     /** How much money the player has from bribing others */
     public int currentMoney = 0;
+    private Animator animator;
+
+    private bool freezeMov = false;
 
     // Use this for initialization
     void Start () {
@@ -36,12 +39,17 @@ public class PlayerControler : PersonBrain {
         this.fixLayer = this.GetComponentInChildren<FixLayer>();
         this.fixLayer.fixLayer(this as PersonBrain, true);
 
+        animator = GetComponentInChildren<Animator>();
+
         //this.GetComponent<SpriteRenderer>().sortingOrder = 20;
     }
 	
 	// Update is called once per frame
 	void Update () {
-        if (Input.GetAxisRaw("Horizontal") < -0.3f) {
+        if (freezeMov) {
+
+        }
+        else if (Input.GetAxisRaw("Horizontal") < -0.3f) {
             this.rbody.velocity = new Vector2(-this.horizontalSpeed, 0.0f);
             this.personTarget = null;
             this.hasMouseTarget = false;
@@ -120,6 +128,13 @@ public class PlayerControler : PersonBrain {
             this.fixLayer.moveLeft();
             this.dir = enDir.right;
         }
+
+        if (this.rbody.velocity.x != 0f) {
+            animator.SetFloat("MovBlend", 1);
+        }
+        else {
+            animator.SetFloat("MovBlend", 0);
+        }
     }
 
     new public void OnTriggerEnter2D(Collider2D other) {
@@ -163,6 +178,8 @@ public class PlayerControler : PersonBrain {
                         this.personTarget = null;
 
                         this.currentMoney -= other.getPrice();
+                        animator.SetTrigger("Bribe");
+                        StartCoroutine("STOP");
                         other.doBribe();
 
                         return;
@@ -179,6 +196,12 @@ public class PlayerControler : PersonBrain {
             // TODO Add a sign that you can't bribe that person
             Debug.Log("Can't bribe that person!");
         }
+    }
+
+    private System.Collections.IEnumerator STOP() {
+        freezeMov = true;
+        yield return new WaitForSeconds(2f);
+        freezeMov = false;
     }
 
     override public void initInstance(enType type, enColor color, bool isPlayer) {

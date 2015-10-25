@@ -135,7 +135,7 @@ public class LevelManager: MonoBehaviour {
                     Application.LoadLevel(1);
                 }
                 else {
-                    // TODO Switch scene
+                    Application.LoadLevel(2);
                 }
             }
         }
