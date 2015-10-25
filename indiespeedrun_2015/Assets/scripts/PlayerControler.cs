@@ -34,6 +34,7 @@ public class PlayerControler : PersonBrain {
 
         this.overlapping = new List<PersonBrain>();
         this.fixLayer = this.GetComponentInChildren<FixLayer>();
+        this.fixLayer.fixLayer(this as PersonBrain, true);
 
         //this.GetComponent<SpriteRenderer>().sortingOrder = 20;
     }

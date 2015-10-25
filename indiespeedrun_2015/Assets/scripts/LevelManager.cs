@@ -1,5 +1,6 @@
 ﻿using UnityEngine;
 using System.Collections.Generic;
+using UnityEngine.UI;
 
 public class LevelManager: MonoBehaviour {
 
@@ -30,8 +31,12 @@ public class LevelManager: MonoBehaviour {
     public Sprite mesa;
     public Sprite planta;
 
+    public Text gottenText;
+    public Text cashText;
+
     /** List of currently active persons in the level */
     private List<Transform> personsInUse = null;
+    private PlayerControler plCtrl;
     /**
      * List of currently inactive persons that may be recycled on the next
      * level
@@ -69,6 +74,7 @@ public class LevelManager: MonoBehaviour {
 
         // Spawn player
         player = Instantiate(playerPrefab);
+        plCtrl = player.GetComponent<PlayerControler>();
 
         curLevel = -1;
         startLevel(curLevel);
@@ -82,7 +88,10 @@ public class LevelManager: MonoBehaviour {
         if (objectiveDone) {
             elevatorSpr.sprite = elevador_on;
         }
-	}
+
+        this.gottenText.text = this.currentFollowers.ToString("D2");
+        this.cashText.text = this.plCtrl.currentMoney.ToString("D4");
+    }
 
     public int countFreeWithColor(PersonBrain.enColor color, PersonBrain.enType type) {
         int count;
