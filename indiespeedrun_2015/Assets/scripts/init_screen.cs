@@ -9,6 +9,7 @@ public class init_screen : MonoBehaviour {
 
     public Transform credits;
     public SpriteRenderer creditsSpr;
+    private bool creditsRunning = false;
 
     // Use this for initialization
     void Start() {
@@ -44,11 +45,13 @@ public class init_screen : MonoBehaviour {
     }
 
     public void displayCredits() {
-        StartCoroutine(onCredits());
+        if (!creditsRunning)
+            StartCoroutine(onCredits());
     }
 
     public IEnumerator onCredits() {
         didFinish = false;
+        creditsRunning = true;
 
         StartCoroutine(creditFadeIn());
         while (!didFinish) {
@@ -64,6 +67,7 @@ public class init_screen : MonoBehaviour {
         while (!didFinish) {
             yield return null;
         }
+        creditsRunning = false;
     }
 
     public IEnumerator creditFadeIn() {

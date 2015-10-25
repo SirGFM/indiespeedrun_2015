@@ -47,7 +47,7 @@ public class EndGameScene : MonoBehaviour {
 		float charWalkMultiplier = 1;
 		bool bossDied = false;
 		
-		while(timeCount <= 17){
+		while(timeCount <= 17.5f){
 			
 			//Mover e parar char
 			mainChar.GetComponent<Animator>().SetFloat("MovBlend", charWalkMultiplier);

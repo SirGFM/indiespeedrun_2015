@@ -1,12 +1,12 @@
 fileFormatVersion: 2
-guid: 68e34c7edfd1cb54b91b38cea88a7d0d
-timeCreated: 1445792132
+guid: 006eb7e6591fc59489d8ffadb08d0099
+timeCreated: 1445799260
 licenseType: Free
 TextureImporter:
   fileIDToRecycleName:
-    21300000: SpriteSheet_PLAY_0
-    21300002: SpriteSheet_PLAY_2
-    21300004: SpriteSheet_PLAY_3
+    21300000: SpriteSheet_CREDITS_0
+    21300002: SpriteSheet_CREDITS_1
+    21300004: SpriteSheet_CREDITS_2
   serializedVersion: 2
   mipmaps:
     mipMapMode: 0
@@ -53,33 +53,33 @@ TextureImporter:
   buildTargetSettings: []
   spriteSheet:
     sprites:
-    - name: SpriteSheet_PLAY_0
+    - name: SpriteSheet_CREDITS_0
       rect:
         serializedVersion: 2
         x: 0
         y: 0
-        width: 552
-        height: 147
-      alignment: 0
-      pivot: {x: .5, y: .5}
-      border: {x: 0, y: 0, z: 4, w: 0}
-    - name: SpriteSheet_PLAY_2
-      rect:
-        serializedVersion: 2
-        x: 552
-        y: 0
-        width: 552
-        height: 147
+        width: 446
+        height: 109
       alignment: 0
       pivot: {x: .5, y: .5}
       border: {x: 0, y: 0, z: 0, w: 0}
-    - name: SpriteSheet_PLAY_3
+    - name: SpriteSheet_CREDITS_1
       rect:
         serializedVersion: 2
-        x: 1104
+        x: 446
         y: 0
-        width: 552
-        height: 147
+        width: 446
+        height: 109
+      alignment: 0
+      pivot: {x: .5, y: .5}
+      border: {x: 0, y: 0, z: 0, w: 0}
+    - name: SpriteSheet_CREDITS_2
+      rect:
+        serializedVersion: 2
+        x: 892
+        y: 0
+        width: 446
+        height: 109
       alignment: 0
       pivot: {x: .5, y: .5}
       border: {x: 0, y: 0, z: 0, w: 0}
