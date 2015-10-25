@@ -40,6 +40,7 @@ public class LevelManager: MonoBehaviour {
     /** List of currently active persons in the level */
     private List<Transform> personsInUse = null;
     private PlayerControler plCtrl;
+    private bool didSetElevator;
     /**
      * List of currently inactive persons that may be recycled on the next
      * level
@@ -95,6 +96,13 @@ public class LevelManager: MonoBehaviour {
         this.gottenText.text = this.currentFollowers.ToString("D2");
         this.cashText.text = this.plCtrl.currentMoney.ToString("D4");
         this.requiredPeople.text = this.targetFollowers.ToString("D2");
+
+        if (this.currentFollowers >= this.targetFollowers) {
+            if (!this.didSetElevator) {
+                this.elevatorSpr.sprite = elevador_on;
+                this.didSetElevator = true;
+            }
+        }
     }
 
     public int countFreeWithColor(PersonBrain.enColor color, PersonBrain.enType type) {
@@ -411,6 +419,7 @@ public class LevelManager: MonoBehaviour {
             spr.sprite = elevador_off;
             elevatorSpr = spr;
         }
+        this.didSetElevator = false;
 
         player.GetComponent<PlayerControler>().clear(initialMoney);
     }
