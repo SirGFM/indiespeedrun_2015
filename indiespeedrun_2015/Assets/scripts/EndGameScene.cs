@@ -148,6 +148,7 @@ public class EndGameScene : MonoBehaviour {
 		}
 
 		//SAIRRRRR!!!!
+		Application.LoadLevel(0);
 
 		//CUIDADO: NÃO FAÇA UM WHILE SEM AO MENOS TER UM YIELD DENTRO
 		//yield return null; //wait for a frame
