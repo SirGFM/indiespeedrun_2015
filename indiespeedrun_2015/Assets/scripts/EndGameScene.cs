@@ -98,7 +98,7 @@ public class EndGameScene : MonoBehaviour {
 		iniInterp = 19.5f;
 		bool charFullWalk = false;
 		charWalkMultiplier = SKIN;
-		while(timeCount <= 28){
+		while(timeCount <= 30){
 			Debug.Log("Vai PRAA");
 			//Fazer char andar
 			mainChar.GetComponent<Animator>().SetFloat("MovBlend", charWalkMultiplier);
