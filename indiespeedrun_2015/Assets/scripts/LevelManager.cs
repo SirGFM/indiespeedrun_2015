@@ -34,6 +34,9 @@ public class LevelManager: MonoBehaviour {
     public Text gottenText;
     public Text cashText;
 
+    public Canvas canvas;
+    public Text requiredPeople;
+
     /** List of currently active persons in the level */
     private List<Transform> personsInUse = null;
     private PlayerControler plCtrl;
@@ -91,6 +94,7 @@ public class LevelManager: MonoBehaviour {
 
         this.gottenText.text = this.currentFollowers.ToString("D2");
         this.cashText.text = this.plCtrl.currentMoney.ToString("D4");
+        this.requiredPeople.text = this.targetFollowers.ToString("D2");
     }
 
     public int countFreeWithColor(PersonBrain.enColor color, PersonBrain.enType type) {
@@ -346,7 +350,7 @@ public class LevelManager: MonoBehaviour {
                     };
             } break;
             default: {
-                width = 5;
+                width = 3;
                 initialMoney = 10;
                 targetFollowers = 5;
                 people = new PersonBrain.enColor[] {
@@ -389,6 +393,12 @@ public class LevelManager: MonoBehaviour {
 
             if (x + spr.sprite.bounds.extents.x * 2f - 0.1f < width) {
                 spawnFurniture(x);
+            }
+            else {
+                float y;
+
+                y = this.requiredPeople.GetComponentInParent<RectTransform>().position.y;
+                this.requiredPeople.GetComponentInParent<RectTransform>().position = new Vector3(x + 4.85f - 4.5f, y);
             }
 
             x += spr.sprite.bounds.extents.x * 2f - 0.1f;
