@@ -46,8 +46,10 @@
   </ItemGroup>
   <ItemGroup>
      <Compile Include="Assets\scripts\CharCostumeController.cs" />
+     <Compile Include="Assets\scripts\FollowCamera.cs" />
      <Compile Include="Assets\scripts\LevelManager.cs" />
      <Compile Include="Assets\scripts\PersonBrain.cs" />
+     <Compile Include="Assets\scripts\PlayerControler.cs" />
  <Reference Include="UnityEngine.UI">
  <HintPath>C:/Program Files/Unity/Editor/Data/UnityExtensions/Unity/GUISystem/UnityEngine.UI.dll</HintPath>
  </Reference>
