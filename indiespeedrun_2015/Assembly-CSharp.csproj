@@ -46,6 +46,7 @@
   </ItemGroup>
   <ItemGroup>
      <Compile Include="Assets\scripts\CharCostumeController.cs" />
+     <Compile Include="Assets\scripts\EndGameScene.cs" />
      <Compile Include="Assets\scripts\FollowCamera.cs" />
      <Compile Include="Assets\scripts\LevelManager.cs" />
      <Compile Include="Assets\scripts\PersonBrain.cs" />
