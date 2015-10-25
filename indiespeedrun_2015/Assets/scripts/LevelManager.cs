@@ -240,9 +240,57 @@ public class LevelManager: MonoBehaviour {
         }
     }
 
+    /**
+     * Spawn a new level
+     * 
+     * @param [in]width           The width of the level in "scene chunks"
+     * @param [in]initiaMoney     How much money the player has to bribe people
+     * @param [in]targetFollowers How many follower the player must have to
+     *                            advance
+     * @param [in]people          Array of people's colors
+     */
+    private void spawnLevel(int width, int initialMoney, int targetFollowers,
+            PersonBrain.enColor[] people) {
+        int i;
+
+        // Temporarially store this width so it can be returned
+        this.width = width * 9 * 20 - 4.5f;
+
+        // TODO Store the initial money and target followers
+        this.player.GetComponent<PlayerControler>().currentMoney = initialMoney;
+
+        // Set the limits for the RNG
+        PersonBrain.minHorPosition = -4.4f;
+        PersonBrain.maxHorPosition = this.width - 4.5f;
+        // Spawn everything
+        i = 0;
+        while (i < people.Length) {
+            PersonBrain.enColor color;
+            PersonBrain.enType type;
+
+            color = people[i];
+            switch (color) {
+                case PersonBrain.enColor.magenta: type = PersonBrain.enType.level_0; break;
+                case PersonBrain.enColor.cyan: type = PersonBrain.enType.level_0; break;
+                case PersonBrain.enColor.yellow: type = PersonBrain.enType.level_0; break;
+                case PersonBrain.enColor.red: type = PersonBrain.enType.level_1; break;
+                case PersonBrain.enColor.green: type = PersonBrain.enType.level_1; break;
+                case PersonBrain.enColor.blue: type = PersonBrain.enType.level_1; break;
+                case PersonBrain.enColor.black: type = PersonBrain.enType.level_2; break;
+                case PersonBrain.enColor.white: type = PersonBrain.enType.level_2; break;
+                default: type = PersonBrain.enType.level_0; break;
+            }
+            spawnNewPerson(type, color);
+
+            i++;
+        }
+    }
+
     void startLevel(int level) {
         float x, width;
         SpriteRenderer spr;
+        int initialMoney, targetFollowers;
+        PersonBrain.enColor[] people;
 
         // Should stop before an erro happens later on
         if (!personPrefab) {
@@ -265,37 +313,44 @@ public class LevelManager: MonoBehaviour {
 
         // Set default width
         width = 9 * 20 - 4.5f; // This means 3 bgs of 9 unities
-        PersonBrain.minHorPosition = -4.4f;
 
         // Spawn every player for that level
         switch (level) {
             case 0: {
-                // TODO set width
-                PersonBrain.maxHorPosition = width - 4.5f;
-                // TODO Spawn stuff
-                spawnNewPerson(PersonBrain.enType.level_1, PersonBrain.enColor.green);
-                spawnNewPerson(PersonBrain.enType.level_2, PersonBrain.enColor.red);
-                } break;
+                width = 3;
+                initialMoney = 4;
+                targetFollowers = 3;
+                people = new PersonBrain.enColor[] {
+                        PersonBrain.enColor.magenta,
+                        PersonBrain.enColor.yellow
+                    };
+            } break;
             default: {
-                // TODO set width
-                PersonBrain.maxHorPosition = width - 4.5f;
-                // TODO Spawn more stuff
-                spawnNewPerson(PersonBrain.enType.level_0, PersonBrain.enColor.magenta);
-                spawnNewPerson(PersonBrain.enType.level_0, PersonBrain.enColor.magenta);
-                spawnNewPerson(PersonBrain.enType.level_0, PersonBrain.enColor.cyan);
-                spawnNewPerson(PersonBrain.enType.level_0, PersonBrain.enColor.cyan);
-                spawnNewPerson(PersonBrain.enType.level_0, PersonBrain.enColor.yellow);
-                spawnNewPerson(PersonBrain.enType.level_0, PersonBrain.enColor.yellow);
-                spawnNewPerson(PersonBrain.enType.level_1, PersonBrain.enColor.red);
-                spawnNewPerson(PersonBrain.enType.level_1, PersonBrain.enColor.red);
-                spawnNewPerson(PersonBrain.enType.level_1, PersonBrain.enColor.blue);
-                spawnNewPerson(PersonBrain.enType.level_1, PersonBrain.enColor.blue);
-                spawnNewPerson(PersonBrain.enType.level_1, PersonBrain.enColor.green);
-                spawnNewPerson(PersonBrain.enType.level_1, PersonBrain.enColor.green);
-                spawnNewPerson(PersonBrain.enType.level_2, PersonBrain.enColor.black);
+                width = 5;
+                initialMoney = 10;
+                targetFollowers = 5;
+                people = new PersonBrain.enColor[] {
+                        PersonBrain.enColor.magenta,
+                        PersonBrain.enColor.magenta,
+                        PersonBrain.enColor.cyan,
+                        PersonBrain.enColor.cyan,
+                        PersonBrain.enColor.yellow,
+                        PersonBrain.enColor.yellow,
+                        PersonBrain.enColor.red,
+                        PersonBrain.enColor.red,
+                        PersonBrain.enColor.blue,
+                        PersonBrain.enColor.blue,
+                        PersonBrain.enColor.green,
+                        PersonBrain.enColor.green,
+                        PersonBrain.enColor.black
+                    };
             } break;
         }
-        
+        // Spawn the actual level
+        spawnLevel((int)width, initialMoney, targetFollowers, people);
+        // Retrieve the value previously calculated
+        width = this.width;
+
         x = 0;
         spr = null;
         lastFurniture = -1;
