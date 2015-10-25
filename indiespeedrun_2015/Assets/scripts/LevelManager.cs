@@ -44,6 +44,7 @@ public class LevelManager: MonoBehaviour {
     private SpriteRenderer elevatorSpr = null;
     private int lastFurniture;
     private int lastFurniture2;
+    private int lastFurniture3;
 
     // Use this for initialization
     void Start () {
@@ -176,53 +177,67 @@ public class LevelManager: MonoBehaviour {
     }
 
     void spawnFurniture (float centerX) {
+        bool isSecond;
+        int newFurniture, repeat;
         Transform bg;
         SpriteRenderer spr;
-        int newFurniture;
 
-        bg = getNewBG();
-        spr = bg.GetComponent<SpriteRenderer>();
-        spr.sortingOrder = 1;
+        repeat = 1;
+        isSecond = false;
+        while (repeat > 0) {
+            bg = getNewBG();
+            spr = bg.GetComponent<SpriteRenderer>();
+            spr.sortingOrder = 2;
 
-        spr.transform.localScale = Vector3.one;
-        newFurniture = this.lastFurniture;
-        while (newFurniture == this.lastFurniture || newFurniture == this.lastFurniture2) {
-            newFurniture = Random.Range(0, 5);
+            spr.transform.localScale = Vector3.one;
+            newFurniture = this.lastFurniture;
+            while (newFurniture == this.lastFurniture ||
+                    newFurniture == this.lastFurniture2 ||
+                    newFurniture == this.lastFurniture3 ||
+                    (isSecond && (newFurniture == 3 || newFurniture == 0))) {
+                newFurniture = Random.Range(0, 5);
+            }
+            switch (newFurniture) {
+                case 0:{
+                    spr.transform.position = new Vector3(centerX + 4.64f, -0.29f, 0.0f);
+                    spr.sprite = bebedouro;
+                } break;
+                case 1: {
+                    float x = Random.Range(-2.14f, 2.14f);
+                    spr.transform.position = new Vector3(centerX + x, -2.62f, 0.0f);
+                    spr.sprite = lixo;
+                } break;
+                case 2: {
+                    spr.transform.position = new Vector3(centerX, -0.86f, 0.0f);
+                    spr.sprite = cafeteira;
+                } break;
+                case 3: {
+                    spr.transform.position = new Vector3(centerX + 4.51f, 2.172f, 0.0f);
+                    spr.transform.localScale = new Vector3(0.15f, 0.15f);
+                    spr.sprite = poster;
+                    spr.sortingOrder = 1;
+                    // Always add another sprite together with the poster
+                    repeat++;
+                } break;
+                case 4: {
+                    float x;
+                    x = Random.Range(0, 4.5f);
+                    spr.transform.position = new Vector3(centerX + x, -0.15f, 0.0f);
+                    spr.sprite = planta;
+                } break;
+                case 5: {
+                    float x;
+                    x = Random.Range(-1.25f, 2.5f);
+                    spr.transform.position = new Vector3(centerX + x, -1.6f, 0.0f);
+                    spr.sprite = mesa;
+                } break;
+            }
+            this.lastFurniture3 = this.lastFurniture2;
+            this.lastFurniture2 = this.lastFurniture;
+            this.lastFurniture = newFurniture;
+            repeat--;
+            isSecond = true;
         }
-        switch (newFurniture) {
-            case 0:{
-                spr.transform.position = new Vector3(centerX + 4.64f, -0.29f, 0.0f);
-                spr.sprite = bebedouro;
-            } break;
-            case 1: {
-                float x = Random.Range(-2.14f, 2.14f);
-                spr.transform.position = new Vector3(centerX + x, -2.62f, 0.0f);
-                spr.sprite = lixo;
-            } break;
-            case 2: {
-                spr.transform.position = new Vector3(centerX, -0.86f, 0.0f);
-                spr.sprite = cafeteira;
-            } break;
-            case 3: {
-                spr.transform.position = new Vector3(centerX + 4.51f, 2.172f, 0.0f);
-                spr.sprite = poster;
-                spr.transform.localScale = new Vector3(0.15f, 0.15f);
-            } break;
-            case 4: {
-                float x;
-                x = Random.Range(0, 4.5f);
-                spr.transform.position = new Vector3(centerX + x, -0.15f, 0.0f);
-                spr.sprite = planta;
-            } break;
-            case 5: {
-                float x;
-                x = Random.Range(-1.25f, 2.5f);
-                spr.transform.position = new Vector3(centerX + x, -1.6f, 0.0f);
-                spr.sprite = mesa;
-            } break;
-        }
-        this.lastFurniture2 = this.lastFurniture;
-        this.lastFurniture = newFurniture;
     }
 
     void startLevel(int level) {
@@ -285,6 +300,7 @@ public class LevelManager: MonoBehaviour {
         spr = null;
         lastFurniture = -1;
         lastFurniture2 = -2;
+        lastFurniture3 = -3;
         while (x < width) {
             Transform bg;
 
@@ -296,7 +312,9 @@ public class LevelManager: MonoBehaviour {
             spr.sprite = cenario;
             spr.sortingOrder = 0;
 
-            spawnFurniture(x);
+            if (x + spr.sprite.bounds.extents.x * 2f - 0.1f < width) {
+                spawnFurniture(x);
+            }
 
             x += spr.sprite.bounds.extents.x * 2f - 0.1f;
 
