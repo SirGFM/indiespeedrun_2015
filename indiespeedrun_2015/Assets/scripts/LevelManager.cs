@@ -41,10 +41,20 @@ public class LevelManager: MonoBehaviour {
     private List<Transform> bgInUse = null;
     /** All the background's sprites recyled for later use */
     private List<Transform> bgRecycled = null;
+    /** Elevator sprite (so its texture can be changed) */
     private SpriteRenderer elevatorSpr = null;
+    /** Last placed furniture */
     private int lastFurniture;
+    /** Second-to-last placed furniture */
     private int lastFurniture2;
+    /** Third-to-last placed furniture */
     private int lastFurniture3;
+    /** How many followers are required until we go to the next level */
+    public int targetFollowers;
+    /** How many followers are required until we go to the next level */
+    public int currentFollowers;
+    /** How many people has been bribed through the levels */
+    public int accBribed = 0;
 
     // Use this for initialization
     void Start () {
@@ -244,20 +254,20 @@ public class LevelManager: MonoBehaviour {
      * Spawn a new level
      * 
      * @param [in]width           The width of the level in "scene chunks"
-     * @param [in]initiaMoney     How much money the player has to bribe people
      * @param [in]targetFollowers How many follower the player must have to
      *                            advance
      * @param [in]people          Array of people's colors
      */
-    private void spawnLevel(int width, int initialMoney, int targetFollowers,
+    private void spawnLevel(int width, int targetFollowers,
             PersonBrain.enColor[] people) {
         int i;
 
         // Temporarially store this width so it can be returned
-        this.width = width * 9 * 20 - 4.5f;
+        this.width = width * 9 - 4.5f;
 
-        // TODO Store the initial money and target followers
-        this.player.GetComponent<PlayerControler>().currentMoney = initialMoney;
+        // Store how many followers are required to finish this level
+        this.targetFollowers = targetFollowers;
+        this.currentFollowers = 0;
 
         // Set the limits for the RNG
         PersonBrain.minHorPosition = -4.4f;
@@ -286,6 +296,9 @@ public class LevelManager: MonoBehaviour {
         }
     }
 
+    /**
+     * Initialize a new level
+     */
     void startLevel(int level) {
         float x, width;
         SpriteRenderer spr;
@@ -311,11 +324,9 @@ public class LevelManager: MonoBehaviour {
         }
         bgInUse.Clear();
 
-        // Set default width
-        width = 9 * 20 - 4.5f; // This means 3 bgs of 9 unities
-
         // Spawn every player for that level
         switch (level) {
+            // TODO Create the actual levels!!!
             case 0: {
                 width = 3;
                 initialMoney = 4;
@@ -347,7 +358,7 @@ public class LevelManager: MonoBehaviour {
             } break;
         }
         // Spawn the actual level
-        spawnLevel((int)width, initialMoney, targetFollowers, people);
+        spawnLevel((int)width, targetFollowers, people);
         // Retrieve the value previously calculated
         width = this.width;
 
@@ -382,6 +393,6 @@ public class LevelManager: MonoBehaviour {
             elevatorSpr = spr;
         }
 
-        player.GetComponent<PlayerControler>().clear();
+        player.GetComponent<PlayerControler>().clear(initialMoney);
     }
 }

@@ -114,17 +114,21 @@ public class PlayerControler : PersonBrain {
     new public void OnTriggerEnter2D(Collider2D other) {
         PersonBrain otherBrain;
 
-        otherBrain = other.GetComponent<PersonBrain>();
-        if (otherBrain) {
-            this.overlapping.Add(otherBrain);
+        if (other != null) {
+            otherBrain = other.GetComponent<PersonBrain>();
+            if (otherBrain != null) {
+                this.overlapping.Add(otherBrain);
+            }
         }
     }
     public void OnTriggerExit2D(Collider2D other) {
         PersonBrain otherBrain;
 
-        otherBrain = other.GetComponent<PersonBrain>();
-        if (otherBrain && this.overlapping.Contains(otherBrain)) {
-            this.overlapping.Remove(otherBrain);
+        if (other != null) {
+            otherBrain = other.GetComponent<PersonBrain>();
+            if (otherBrain != null && this.overlapping.Contains(otherBrain)) {
+                this.overlapping.Remove(otherBrain);
+            }
         }
     }
 
@@ -179,9 +183,14 @@ public class PlayerControler : PersonBrain {
         this.isRunningAI = true;
     }
 
-    public void clear() {
+    public void clear(int initialMoney) {
+        // Removed everything that was overlapping
         if (this.overlapping != null) {
             this.overlapping.Clear();
         }
+        // Reset the position
+        this.transform.position = Vector3.zero;
+        // Reset the amount of money
+        this.currentMoney = initialMoney;
     }
 }

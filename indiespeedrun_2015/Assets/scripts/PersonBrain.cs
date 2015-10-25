@@ -162,8 +162,6 @@ public class PersonBrain : MonoBehaviour {
             {
                 float time;
 
-                time = Random.Range(minWalkTime, maxWalkTime);
-
                 // Set speed
                 if (this.transform.position.x <= PersonBrain.minHorPosition) {
                     this.rbody.velocity = new Vector2(this.horizontalSpeed, 0.0f);
@@ -177,6 +175,30 @@ public class PersonBrain : MonoBehaviour {
                 else {
                     this.rbody.velocity = new Vector2(this.horizontalSpeed, 0.0f);
                 }
+                
+                // Make the person walk more to the oposing direction
+                /*
+                if (this.transform.position.x < PersonBrain.lvlManager.width / 4f &&
+                        this.rbody.velocity.x < 0) { 
+                    time = Random.Range(minWalkTime, maxWalkTime / 2f);
+                }
+                else if (this.transform.position.x < PersonBrain.lvlManager.width / 4f &&
+                        this.rbody.velocity.x > 0) { 
+                    time = Random.Range(minWalkTime, maxWalkTime / 4f * 3f);
+                }
+                else if (this.transform.position.x > PersonBrain.lvlManager.width / 4f * 3f &&
+                        this.rbody.velocity.x > 0) { 
+                    time = Random.Range(minWalkTime, maxWalkTime / 2f);
+                }
+                else if (this.transform.position.x > PersonBrain.lvlManager.width / 4f * 3f &&
+                        this.rbody.velocity.x < 0) { 
+                    time = Random.Range(minWalkTime, maxWalkTime / 4f * 3f);
+                }
+                else {
+                    time = Random.Range(minWalkTime, maxWalkTime);
+                }
+                */
+                time = Random.Range(minWalkTime, maxWalkTime);
 
                 Debug.Log("Walking for " + time.ToString() + "s");
                 yield return new WaitForSeconds(time);
@@ -205,6 +227,8 @@ public class PersonBrain : MonoBehaviour {
                 yield return new WaitForSeconds(this.influenceTime);
 
                 this.state = enState.bribed;
+                PersonBrain.lvlManager.currentFollowers++;
+                PersonBrain.lvlManager.accBribed++;
             } break;
             case enAIState.follow: {
                 Transform player;
@@ -305,6 +329,11 @@ public class PersonBrain : MonoBehaviour {
             spr.color = new Color(r, g, b);
 
             yield return null;
+        }
+
+        // Update the required people count
+        if (this.state != enState.bribed) {
+            PersonBrain.lvlManager.currentFollowers++;
         }
     }
 
