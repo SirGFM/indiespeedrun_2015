@@ -407,6 +407,12 @@ public class PersonBrain : MonoBehaviour {
             this.fixLayer.fixLayer(this, isPlayer);
             this.sprBody = this.fixLayer.getBody();
         }
+
+        switch(type) {
+            case enType.level_0: this.fixLayer.setType(0); break;
+            case enType.level_1: this.fixLayer.setType(1); break;
+            case enType.level_2: this.fixLayer.setType(2); break;
+        }
         
         switch (this.color) {
             case enColor.red:     c32 = new Color32(0xed, 0x6a, 0x6a, 0xff); break;
@@ -415,8 +421,7 @@ public class PersonBrain : MonoBehaviour {
             case enColor.magenta: c32 = new Color32(0xda, 0x71, 0xb0, 0xff); break;
             case enColor.cyan:    c32 = new Color32(0x69, 0xb6, 0xd3, 0xff); break;
             case enColor.yellow:  c32 = new Color32(0xe1, 0xda, 0x4f, 0xff); break;
-            // TODO Change black's color to white (since it' already on the texture)
-            case enColor.black:   c32 = new Color32(0x00, 0x00, 0x00, 0xff); break;
+            case enColor.black:   c32 = new Color32(0xff, 0xff, 0xff, 0xff); break;
             case enColor.white:   c32 = new Color32(0xff, 0xff, 0xff, 0xff); break;
             default:              c32 = new Color32(0xff, 0xff, 0xff, 0xff); break;
         }

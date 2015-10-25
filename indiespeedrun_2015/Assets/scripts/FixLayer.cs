@@ -43,6 +43,10 @@ public class FixLayer : MonoBehaviour {
         return this.body;
     }
 
+    public void setType(int type) {
+        this.GetComponent<CharCostumeController>().ChangeLevel(type);
+    }
+
     public void moveLeft() {
         float scale;
 

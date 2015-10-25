@@ -108,7 +108,7 @@ public class LevelManager: MonoBehaviour {
                 if (curLevel < lastLevel) {
                     // TODO FUCKING FIX THIS!
                     //StartCoroutine(NextLevel());
-                    // NextLevel();
+                    NextLevel();
                 }
                 else {
                     // TODO Switch scene
@@ -369,6 +369,15 @@ public class LevelManager: MonoBehaviour {
         switch (level) {
             // TODO Create the actual levels!!!
             case 0: {
+                width = 3;
+                initialMoney = 4;
+                targetFollowers = 3;
+                people = new PersonBrain.enColor[] {
+                        PersonBrain.enColor.magenta,
+                        PersonBrain.enColor.yellow
+                    };
+            } break;
+            case 1: {
                 width = 3;
                 initialMoney = 4;
                 targetFollowers = 3;
