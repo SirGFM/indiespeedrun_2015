@@ -12,7 +12,7 @@ public class LevelManager: MonoBehaviour {
     public Transform bgPrefab = null;
 
     /** Store the current level, should be increased on level transition */
-    public int curLevel = 0;
+    static public int curLevel = 0;
     public int lastLevel = 2;
     /** The player */
     public Transform player;
@@ -81,7 +81,7 @@ public class LevelManager: MonoBehaviour {
         player = Instantiate(playerPrefab);
         plCtrl = player.GetComponent<PlayerControler>();
 
-        curLevel = -1;
+        curLevel = 0;
         startLevel(curLevel);
     }
 	
@@ -108,7 +108,9 @@ public class LevelManager: MonoBehaviour {
                 if (curLevel < lastLevel) {
                     // TODO FUCKING FIX THIS!
                     //StartCoroutine(NextLevel());
-                    NextLevel();
+                    //NextLevel();
+                    curLevel++;
+                    Application.LoadLevel(1);
                 }
                 else {
                     // TODO Switch scene
@@ -215,7 +217,7 @@ public class LevelManager: MonoBehaviour {
         personScript = newPerson.GetComponent<PersonBrain>();
 
         if (personScript) {
-            personScript.initInstance(type, color);
+            personScript.initInstance(type, color, false);
 
             personsInUse.Add(newPerson);
         }
@@ -371,10 +373,14 @@ public class LevelManager: MonoBehaviour {
             case 0: {
                 width = 3;
                 initialMoney = 4;
-                targetFollowers = 3;
+                targetFollowers = 5;
                 people = new PersonBrain.enColor[] {
                         PersonBrain.enColor.magenta,
-                        PersonBrain.enColor.yellow
+                        PersonBrain.enColor.magenta,
+                        PersonBrain.enColor.magenta,
+                        PersonBrain.enColor.cyan,
+                        PersonBrain.enColor.cyan,
+                        PersonBrain.enColor.yellow,
                     };
             } break;
             case 1: {

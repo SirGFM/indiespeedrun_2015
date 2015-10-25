@@ -181,8 +181,8 @@ public class PlayerControler : PersonBrain {
         }
     }
 
-    override public void initInstance(enType type, enColor color, bool isPlayer = false) {
-        base.initInstance(type, color);
+    override public void initInstance(enType type, enColor color, bool isPlayer) {
+        base.initInstance(type, color, true);
 
         // The player position is always static, so set it
         this.transform.position = new Vector3(PersonBrain.minHorPosition, 0.0f, 0.0f);
