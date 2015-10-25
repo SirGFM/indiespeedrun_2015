@@ -93,7 +93,7 @@ public class PersonBrain : MonoBehaviour {
     private SpriteRenderer sprBody;
     protected FixLayer fixLayer;
 
-    private Animator animator;
+    public Animator animator;
 
     // Use this for initialization
     void Start() {

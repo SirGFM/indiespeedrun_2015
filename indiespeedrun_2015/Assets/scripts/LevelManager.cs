@@ -13,7 +13,8 @@ public class LevelManager: MonoBehaviour {
 
     /** Store the current level, should be increased on level transition */
     static public int curLevel = 0;
-    public int lastLevel = 3;
+    public int lastLevel = 2;
+    public int locCurLevel = 2;
     /** The player */
     public Transform player;
     /** Current width of the level */
@@ -127,11 +128,11 @@ public class LevelManager: MonoBehaviour {
             }
 
             if (this.player.position.x >= PersonBrain.maxHorPosition) {
-                if (curLevel < lastLevel) {
+                curLevel++;
+                if (curLevel <= lastLevel) {
                     // TODO FUCKING FIX THIS!
                     //StartCoroutine(NextLevel());
                     //NextLevel();
-                    curLevel++;
                     Application.LoadLevel(1);
                 }
                 else {
@@ -139,6 +140,8 @@ public class LevelManager: MonoBehaviour {
                 }
             }
         }
+
+        locCurLevel = curLevel;
     }
 
     private System.Collections.IEnumerator NextLevel() {
@@ -406,7 +409,7 @@ public class LevelManager: MonoBehaviour {
                     };
             } break;
             case 1: {
-                width = 9;
+                width = 6;
                 initialMoney = 4;
                 targetFollowers = 12;
                 this.plCtrl.advanceType();
@@ -431,7 +434,7 @@ public class LevelManager: MonoBehaviour {
                     };
             } break;
             case 2: {
-                width = 11;
+                width = 8;
                 initialMoney = 4;
                 targetFollowers = 16;
                 sc.PlayLoop(thirdSong, audSrc);

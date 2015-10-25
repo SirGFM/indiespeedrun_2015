@@ -24,7 +24,6 @@ public class PlayerControler : PersonBrain {
 
     /** How much money the player has from bribing others */
     public int currentMoney = 0;
-    private Animator animator;
 
     private bool freezeMov = false;
 
