@@ -20,6 +20,7 @@ public class CharCostumeController : MonoBehaviour {
 	}
 
 	public void ChangeLevel(int level){
+        this.level = level;
 		foreach(SpriteRenderer s in GetComponentsInChildren<SpriteRenderer>()){
 			if(s.gameObject.name == "sprCorpo")
 				s.sprite = corpos[level];

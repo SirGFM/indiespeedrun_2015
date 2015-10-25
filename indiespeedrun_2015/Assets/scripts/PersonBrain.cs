@@ -10,6 +10,8 @@ public class PersonBrain : MonoBehaviour {
         level_0 = 0,
         level_1,
         level_2,
+        follower,
+        boss,
         max
     };
 
@@ -45,6 +47,12 @@ public class PersonBrain : MonoBehaviour {
         max
     };
 
+    public enum enDir {
+        none,
+        left,
+        right
+    }
+
     /** Leftmost position the person can go to */
     static public float minHorPosition = -10.0f;
     /** Rightmost position the person can go to */
@@ -71,6 +79,7 @@ public class PersonBrain : MonoBehaviour {
     public enType type;
     /** This object's color */
     public enColor color;
+    public enDir dir;
 
     /** Current state of the AI */
     public enAIState aiState;
@@ -81,6 +90,8 @@ public class PersonBrain : MonoBehaviour {
     /** The rigid body */
     protected Rigidbody2D rbody;
     private bool isWhite;
+    private SpriteRenderer sprBody;
+    protected FixLayer fixLayer;
 
     // Use this for initialization
     void Start() {
@@ -102,6 +113,15 @@ public class PersonBrain : MonoBehaviour {
         // Reactivate the AI, if it has finished running
         if (!isRunningAI) {
             this.runningCoroutine = StartCoroutine(doAI());
+        }
+        
+        if (this.dir != enDir.left && this.rbody.velocity.x < 0) {
+            this.fixLayer.moveLeft();
+            this.dir = enDir.left;
+        }
+        else if (this.dir != enDir.right && this.rbody.velocity.x > 0) {
+            this.fixLayer.moveRight();
+            this.dir = enDir.right;
         }
     }
 
@@ -177,28 +197,17 @@ public class PersonBrain : MonoBehaviour {
                 }
                 
                 // Make the person walk more to the oposing direction
-                /*
-                if (this.transform.position.x < PersonBrain.lvlManager.width / 4f &&
-                        this.rbody.velocity.x < 0) { 
-                    time = Random.Range(minWalkTime, maxWalkTime / 2f);
+                if (this.transform.position.x < PersonBrain.lvlManager.width / 8f) { 
+                    this.rbody.velocity = new Vector2(this.horizontalSpeed, 0.0f);
+                    time = Random.Range(minWalkTime * 1.5f, maxWalkTime * 2f);
                 }
-                else if (this.transform.position.x < PersonBrain.lvlManager.width / 4f &&
-                        this.rbody.velocity.x > 0) { 
-                    time = Random.Range(minWalkTime, maxWalkTime / 4f * 3f);
-                }
-                else if (this.transform.position.x > PersonBrain.lvlManager.width / 4f * 3f &&
-                        this.rbody.velocity.x > 0) { 
-                    time = Random.Range(minWalkTime, maxWalkTime / 2f);
-                }
-                else if (this.transform.position.x > PersonBrain.lvlManager.width / 4f * 3f &&
-                        this.rbody.velocity.x < 0) { 
-                    time = Random.Range(minWalkTime, maxWalkTime / 4f * 3f);
+                else if (this.transform.position.x > PersonBrain.lvlManager.width / 8f) { 
+                    this.rbody.velocity = new Vector2(-this.horizontalSpeed, 0.0f);
+                    time = Random.Range(minWalkTime * 1.5f, maxWalkTime * 2f);
                 }
                 else {
                     time = Random.Range(minWalkTime, maxWalkTime);
                 }
-                */
-                time = Random.Range(minWalkTime, maxWalkTime);
 
                 Debug.Log("Walking for " + time.ToString() + "s");
                 yield return new WaitForSeconds(time);
@@ -298,14 +307,10 @@ public class PersonBrain : MonoBehaviour {
     }
 
     private IEnumerator fadeToWhite() {
-        SpriteRenderer spr;
-        
-        isWhite = true;
-        spr = this.GetComponent<SpriteRenderer>();
-        while (spr.color != Color.white) {
-            float b = spr.color.b;
-            float g = spr.color.g;
-            float r = spr.color.r;
+        while (this.sprBody != null && this.sprBody.color != Color.white) {
+            float b = this.sprBody.color.b;
+            float g = this.sprBody.color.g;
+            float r = this.sprBody.color.r;
 
             if (r < 1.0f) {
                 r += Time.deltaTime;
@@ -326,7 +331,7 @@ public class PersonBrain : MonoBehaviour {
                 }
             }
 
-            spr.color = new Color(r, g, b);
+            this.sprBody.color = new Color(r, g, b);
 
             yield return null;
         }
@@ -381,9 +386,8 @@ public class PersonBrain : MonoBehaviour {
      * @param type  The type of the person
      * @param color The color of the person
      */
-    virtual public void initInstance(enType type, enColor color) {
+    virtual public void initInstance(enType type, enColor color, bool isPlayer = false) {
         Color32 c32;
-        SpriteRenderer spr;
 
         // Set the instance's properties
         this.type = type;
@@ -392,24 +396,24 @@ public class PersonBrain : MonoBehaviour {
         // Make sure this person can be bribed/influenced
         this.state = enState.free;
         this.isWhite = false;
+        this.dir = enDir.none;
 
         // Always start on idle
         forceAIState(enAIState.idle);
 
-        spr = GetComponent<SpriteRenderer>();
-        switch (type) {
-            case enType.level_0: {
-                spr.sortingOrder = 5;
-            } break;
-            case enType.level_1: {
-                spr.sortingOrder = 6;
-            } break;
-            case enType.level_2: {
-                spr.sortingOrder = 7;
-            } break;
+        this.sprBody = null;
+        this.fixLayer = this.GetComponentInChildren<FixLayer>();
+        if (this.fixLayer != null) {
+            this.fixLayer.fixLayer(this, isPlayer);
+            this.sprBody = this.fixLayer.getBody();
         }
 
-        // TODO Set this only on the shirt sprite
+        switch(type) {
+            case enType.level_0: this.fixLayer.setType(0); break;
+            case enType.level_1: this.fixLayer.setType(1); break;
+            case enType.level_2: this.fixLayer.setType(2); break;
+        }
+        
         switch (this.color) {
             case enColor.red:     c32 = new Color32(0xed, 0x6a, 0x6a, 0xff); break;
             case enColor.green:   c32 = new Color32(0x3e, 0xb7, 0x79, 0xff); break;
@@ -417,12 +421,14 @@ public class PersonBrain : MonoBehaviour {
             case enColor.magenta: c32 = new Color32(0xda, 0x71, 0xb0, 0xff); break;
             case enColor.cyan:    c32 = new Color32(0x69, 0xb6, 0xd3, 0xff); break;
             case enColor.yellow:  c32 = new Color32(0xe1, 0xda, 0x4f, 0xff); break;
-            case enColor.black:   c32 = new Color32(0x00, 0x00, 0x00, 0xff); break;
+            case enColor.black:   c32 = new Color32(0xff, 0xff, 0xff, 0xff); break;
             case enColor.white:   c32 = new Color32(0xff, 0xff, 0xff, 0xff); break;
             default:              c32 = new Color32(0xff, 0xff, 0xff, 0xff); break;
         }
-        spr.color = new Color((float)c32.r / 255.0f, (float)c32.g / 255.0f,
+        if (this.sprBody) {
+            this.sprBody.color = new Color((float)c32.r / 255.0f, (float)c32.g / 255.0f,
                 (float)c32.b / 255.0f);
+        }
         
         // Randomize the position
         this.transform.position = new Vector3(Random.Range(

@@ -1,5 +1,6 @@
 ﻿using UnityEngine;
 using System.Collections.Generic;
+using UnityEngine.UI;
 
 public class LevelManager: MonoBehaviour {
 
@@ -11,7 +12,8 @@ public class LevelManager: MonoBehaviour {
     public Transform bgPrefab = null;
 
     /** Store the current level, should be increased on level transition */
-    public int curLevel;
+    static public int curLevel = 0;
+    public int lastLevel = 3;
     /** The player */
     public Transform player;
     /** Current width of the level */
@@ -30,8 +32,19 @@ public class LevelManager: MonoBehaviour {
     public Sprite mesa;
     public Sprite planta;
 
+    public Text gottenText;
+    public Text cashText;
+
+    public Canvas canvas;
+    public Text requiredPeople;
+
+    public AudioClip secondSong;
+    public AudioClip thirdSong;
+
     /** List of currently active persons in the level */
     private List<Transform> personsInUse = null;
+    private PlayerControler plCtrl;
+    private bool didSetElevator;
     /**
      * List of currently inactive persons that may be recycled on the next
      * level
@@ -56,8 +69,18 @@ public class LevelManager: MonoBehaviour {
     /** How many people has been bribed through the levels */
     public int accBribed = 0;
 
+
+    private SoundController sc;
+    private AudioSource audSrc;
+
+    public void goBack() {
+        Application.LoadLevel(0);
+    }
+
     // Use this for initialization
     void Start () {
+
+        GameObject go;
         // Initialize the static reference to this
         PersonBrain.lvlManager = this;
 
@@ -69,8 +92,18 @@ public class LevelManager: MonoBehaviour {
 
         // Spawn player
         player = Instantiate(playerPrefab);
+        plCtrl = player.GetComponent<PlayerControler>();
 
-        curLevel = -1;
+        go = GameObject.Find("MainAudioController");
+        if (go != null) {
+
+            sc = go.GetComponent<SoundController>();
+            if (sc != null) {
+
+                audSrc = go.GetComponent<AudioSource>();
+            }
+        }
+
         startLevel(curLevel);
     }
 	
@@ -82,7 +115,39 @@ public class LevelManager: MonoBehaviour {
         if (objectiveDone) {
             elevatorSpr.sprite = elevador_on;
         }
-	}
+
+        this.gottenText.text = this.currentFollowers.ToString("D2");
+        this.cashText.text = this.plCtrl.currentMoney.ToString("D4");
+        this.requiredPeople.text = this.targetFollowers.ToString("D2");
+
+        if (this.currentFollowers >= this.targetFollowers) {
+            if (!this.didSetElevator) {
+                this.elevatorSpr.sprite = elevador_on;
+                this.didSetElevator = true;
+            }
+
+            if (this.player.position.x >= PersonBrain.maxHorPosition) {
+                if (curLevel < lastLevel) {
+                    // TODO FUCKING FIX THIS!
+                    //StartCoroutine(NextLevel());
+                    //NextLevel();
+                    curLevel++;
+                    Application.LoadLevel(1);
+                }
+                else {
+                    // TODO Switch scene
+                }
+            }
+        }
+    }
+
+    private System.Collections.IEnumerator NextLevel() {
+        Debug.Log("Start lvl transition coroutine");
+        curLevel++;
+        startLevel(curLevel);
+        Debug.Log("Finished lvl transition coroutine");
+        return null;
+    }
 
     public int countFreeWithColor(PersonBrain.enColor color, PersonBrain.enType type) {
         int count;
@@ -174,7 +239,7 @@ public class LevelManager: MonoBehaviour {
         personScript = newPerson.GetComponent<PersonBrain>();
 
         if (personScript) {
-            personScript.initInstance(type, color);
+            personScript.initInstance(type, color, false);
 
             personsInUse.Add(newPerson);
         }
@@ -329,15 +394,76 @@ public class LevelManager: MonoBehaviour {
             // TODO Create the actual levels!!!
             case 0: {
                 width = 3;
-                initialMoney = 4;
+                initialMoney = 2;
                 targetFollowers = 3;
                 people = new PersonBrain.enColor[] {
                         PersonBrain.enColor.magenta,
+                        PersonBrain.enColor.magenta,
+                        PersonBrain.enColor.magenta,
+                        PersonBrain.enColor.cyan,
+                        PersonBrain.enColor.cyan,
+                        PersonBrain.enColor.yellow,
+                    };
+            } break;
+            case 1: {
+                width = 9;
+                initialMoney = 4;
+                targetFollowers = 12;
+                this.plCtrl.advanceType();
+                sc.PlayLoop(secondSong, audSrc);
+                people = new PersonBrain.enColor[] {
+                        PersonBrain.enColor.magenta,
+                        PersonBrain.enColor.magenta,
+                        PersonBrain.enColor.magenta,
+                        PersonBrain.enColor.magenta,
+                        PersonBrain.enColor.cyan,
+                        PersonBrain.enColor.cyan,
+                        PersonBrain.enColor.cyan,
+                        PersonBrain.enColor.cyan,
+                        PersonBrain.enColor.cyan,
+                        PersonBrain.enColor.cyan,
+                        PersonBrain.enColor.cyan,
+                        PersonBrain.enColor.yellow,
+                        PersonBrain.enColor.yellow,
+                        PersonBrain.enColor.yellow,
+                        PersonBrain.enColor.yellow,
                         PersonBrain.enColor.yellow
                     };
             } break;
+            case 2: {
+                width = 11;
+                initialMoney = 4;
+                targetFollowers = 16;
+                sc.PlayLoop(thirdSong, audSrc);
+                this.plCtrl.advanceType();
+                people = new PersonBrain.enColor[] {
+                        PersonBrain.enColor.magenta,
+                        PersonBrain.enColor.magenta,
+                        PersonBrain.enColor.magenta,
+                        PersonBrain.enColor.magenta,
+                        PersonBrain.enColor.magenta,
+                        PersonBrain.enColor.magenta,
+                        PersonBrain.enColor.cyan,
+                        PersonBrain.enColor.cyan,
+                        PersonBrain.enColor.cyan,
+                        PersonBrain.enColor.cyan,
+                        PersonBrain.enColor.cyan,
+                        PersonBrain.enColor.yellow,
+                        PersonBrain.enColor.yellow,
+                        PersonBrain.enColor.yellow,
+                        PersonBrain.enColor.yellow,
+                        PersonBrain.enColor.yellow,
+                        PersonBrain.enColor.yellow,
+                        PersonBrain.enColor.yellow,
+                        PersonBrain.enColor.yellow,
+                        PersonBrain.enColor.yellow,
+                        PersonBrain.enColor.red,
+                        PersonBrain.enColor.green,
+                        PersonBrain.enColor.blue
+                    };
+            } break;
             default: {
-                width = 5;
+                width = 3;
                 initialMoney = 10;
                 targetFollowers = 5;
                 people = new PersonBrain.enColor[] {
@@ -381,6 +507,12 @@ public class LevelManager: MonoBehaviour {
             if (x + spr.sprite.bounds.extents.x * 2f - 0.1f < width) {
                 spawnFurniture(x);
             }
+            else {
+                float y;
+
+                y = this.requiredPeople.GetComponentInParent<RectTransform>().position.y;
+                this.requiredPeople.GetComponentInParent<RectTransform>().position = new Vector3(x + 4.85f - 4.5f, y);
+            }
 
             x += spr.sprite.bounds.extents.x * 2f - 0.1f;
 
@@ -392,6 +524,7 @@ public class LevelManager: MonoBehaviour {
             spr.sprite = elevador_off;
             elevatorSpr = spr;
         }
+        this.didSetElevator = false;
 
         player.GetComponent<PlayerControler>().clear(initialMoney);
     }

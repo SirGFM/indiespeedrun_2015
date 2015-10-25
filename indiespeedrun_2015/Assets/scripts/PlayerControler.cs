@@ -30,11 +30,13 @@ public class PlayerControler : PersonBrain {
         this.rbody = this.GetComponent<Rigidbody2D>();
         this.mouseTarget = Vector2.zero;
 
-        initInstance(enType.level_0, enColor.white);
+        initInstance(enType.level_0, enColor.white, true);
 
         this.overlapping = new List<PersonBrain>();
+        this.fixLayer = this.GetComponentInChildren<FixLayer>();
+        this.fixLayer.fixLayer(this as PersonBrain, true);
 
-        this.GetComponent<SpriteRenderer>().sortingOrder = 20;
+        //this.GetComponent<SpriteRenderer>().sortingOrder = 20;
     }
 	
 	// Update is called once per frame
@@ -109,12 +111,21 @@ public class PlayerControler : PersonBrain {
         this.didBribeThisFrame = false;
 
         checkOverlap();
+        
+        if (this.dir != enDir.left && this.rbody.velocity.x < 0) {
+            this.fixLayer.moveRight();
+            this.dir = enDir.left;
+        }
+        else if (this.dir != enDir.right && this.rbody.velocity.x > 0) {
+            this.fixLayer.moveLeft();
+            this.dir = enDir.right;
+        }
     }
 
     new public void OnTriggerEnter2D(Collider2D other) {
         PersonBrain otherBrain;
 
-        if (other != null) {
+        if (other != null && this.overlapping != null) {
             otherBrain = other.GetComponent<PersonBrain>();
             if (otherBrain != null) {
                 this.overlapping.Add(otherBrain);
@@ -124,7 +135,7 @@ public class PlayerControler : PersonBrain {
     public void OnTriggerExit2D(Collider2D other) {
         PersonBrain otherBrain;
 
-        if (other != null) {
+        if (other != null && this.overlapping != null) {
             otherBrain = other.GetComponent<PersonBrain>();
             if (otherBrain != null && this.overlapping.Contains(otherBrain)) {
                 this.overlapping.Remove(otherBrain);
@@ -170,8 +181,8 @@ public class PlayerControler : PersonBrain {
         }
     }
 
-    override public void initInstance(enType type, enColor color) {
-        base.initInstance(type, color);
+    override public void initInstance(enType type, enColor color, bool isPlayer) {
+        base.initInstance(type, color, true);
 
         // The player position is always static, so set it
         this.transform.position = new Vector3(PersonBrain.minHorPosition, 0.0f, 0.0f);
@@ -192,5 +203,10 @@ public class PlayerControler : PersonBrain {
         this.transform.position = Vector3.zero;
         // Reset the amount of money
         this.currentMoney = initialMoney;
+    }
+
+    public void advanceType() {
+        this.type++;
+        this.GetComponentInChildren<CharCostumeController>().ChangeLevel((int)this.type);
     }
 }
