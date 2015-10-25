@@ -12,7 +12,8 @@ public class LevelManager: MonoBehaviour {
     public Transform bgPrefab = null;
 
     /** Store the current level, should be increased on level transition */
-    public int curLevel;
+    public int curLevel = 0;
+    public int lastLevel = 2;
     /** The player */
     public Transform player;
     /** Current width of the level */
@@ -102,7 +103,26 @@ public class LevelManager: MonoBehaviour {
                 this.elevatorSpr.sprite = elevador_on;
                 this.didSetElevator = true;
             }
+
+            if (this.player.position.x >= PersonBrain.maxHorPosition) {
+                if (curLevel < lastLevel) {
+                    // TODO FUCKING FIX THIS!
+                    //StartCoroutine(NextLevel());
+                    // NextLevel();
+                }
+                else {
+                    // TODO Switch scene
+                }
+            }
         }
+    }
+
+    private System.Collections.IEnumerator NextLevel() {
+        Debug.Log("Start lvl transition coroutine");
+        curLevel++;
+        startLevel(curLevel);
+        Debug.Log("Finished lvl transition coroutine");
+        return null;
     }
 
     public int countFreeWithColor(PersonBrain.enColor color, PersonBrain.enType type) {

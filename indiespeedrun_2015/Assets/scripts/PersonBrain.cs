@@ -114,7 +114,7 @@ public class PersonBrain : MonoBehaviour {
         if (!isRunningAI) {
             this.runningCoroutine = StartCoroutine(doAI());
         }
-
+        
         if (this.dir != enDir.left && this.rbody.velocity.x < 0) {
             this.fixLayer.moveLeft();
             this.dir = enDir.left;
