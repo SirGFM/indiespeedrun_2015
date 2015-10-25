@@ -109,12 +109,21 @@ public class PlayerControler : PersonBrain {
         this.didBribeThisFrame = false;
 
         checkOverlap();
+        
+        if (this.dir != enDir.left && this.rbody.velocity.x < 0) {
+            this.fixLayer.moveLeft();
+            this.dir = enDir.left;
+        }
+        else if (this.dir != enDir.right && this.rbody.velocity.x > 0) {
+            this.fixLayer.moveRight();
+            this.dir = enDir.right;
+        }
     }
 
     new public void OnTriggerEnter2D(Collider2D other) {
         PersonBrain otherBrain;
 
-        if (other != null) {
+        if (other != null && this.overlapping != null) {
             otherBrain = other.GetComponent<PersonBrain>();
             if (otherBrain != null) {
                 this.overlapping.Add(otherBrain);
@@ -124,7 +133,7 @@ public class PlayerControler : PersonBrain {
     public void OnTriggerExit2D(Collider2D other) {
         PersonBrain otherBrain;
 
-        if (other != null) {
+        if (other != null && this.overlapping != null) {
             otherBrain = other.GetComponent<PersonBrain>();
             if (otherBrain != null && this.overlapping.Contains(otherBrain)) {
                 this.overlapping.Remove(otherBrain);
