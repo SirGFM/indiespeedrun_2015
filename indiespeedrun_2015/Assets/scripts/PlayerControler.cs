@@ -5,8 +5,6 @@ public class PlayerControler : PersonBrain {
 
     /** List of currently overlaping people */
     private List<PersonBrain> overlapping;
-    /** The main camera */
-    private Camera camera;
 
     /** Whether an 'move toward mouse' command was issued */
     private bool hasMouseTarget = false;
@@ -54,18 +52,35 @@ public class PlayerControler : PersonBrain {
         else if (Input.GetMouseButtonDown(0)) {
             // TODO Check if mouse is not overlapping a player and, in that
             // case, follow that player
-            if (!this.didMouse) {
-                // Get the position of the transform beneath the mouse
+            if (this.didMouse) {
+                // TODO Get the position of the transform beneath the mouse
             }
             else {
                 // Simply get the mouse position to move
+                mouseTarget = Camera.main.ScreenToWorldPoint(Input.mousePosition);
                 this.personTarget = null;
             }
             hasMouseTarget = true;
         }
         else if (hasMouseTarget) {
+            Vector3 target;
+
             if (this.personTarget != null) {
-                
+                target = this.personTarget.position;
+            }
+            else {
+                target = mouseTarget;
+            }
+
+            if (this.transform.position.x < target.x - 0.5f) {
+                this.rbody.velocity = new Vector3(this.horizontalSpeed, 0.0f, 0.0f);
+            }
+            else if (this.transform.position.x > target.x + 0.5f) {
+                this.rbody.velocity = new Vector3(-this.horizontalSpeed, 0.0f, 0.0f);
+            }
+            else {
+                hasMouseTarget = false;
+                this.rbody.velocity = Vector3.zero;
             }
         }
         else {
