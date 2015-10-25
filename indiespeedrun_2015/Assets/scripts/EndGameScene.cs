@@ -4,12 +4,15 @@ using System.Collections;
 public class EndGameScene : MonoBehaviour {
 
 	public Camera camera;
+	public SpriteRenderer theBlack;
 	public GameObject mainChar;
 	public GameObject boss;
 	public GameObject[] persons;
+	public GameObject cadeira2;
 
 	public float charsVel;
 	public float camInterpVel = 1;
+	public float fadeBlackVel = .05f;
 
 	public Vector3[] camPos; 
 
@@ -90,29 +93,32 @@ public class EndGameScene : MonoBehaviour {
 			yield return null; //wait for a frame
 		}
 
-
+		Debug.Log("VAAAAAMOOOOO	");
 		animInterp = 0;
 		iniInterp = 19.5f;
 		bool charFullWalk = false;
 		charWalkMultiplier = SKIN;
-		while(true){
-			
+		while(timeCount <= 28){
+			Debug.Log("Vai PRAA");
 			//Fazer char andar
 			mainChar.GetComponent<Animator>().SetFloat("MovBlend", charWalkMultiplier);
 			mainChar.transform.Translate(-charsVel * charWalkMultiplier,0,0);
 			if(!charFullWalk){
-				charWalkMultiplier/=0.95f;	
+				charWalkMultiplier/=0.85f;	
 				if(charWalkMultiplier >=1){
 					charWalkMultiplier=1;
 					charFullWalk = true;
 				}
-			}else if(mainChar.transform.position.x <= -10 && charWalkMultiplier>0){
-					charWalkMultiplier*=0.95f;
-					if(charWalkMultiplier < SKIN)
-						charWalkMultiplier = 0;
+			}else if(mainChar.transform.position.x <= -9f && charWalkMultiplier>0){
+				charWalkMultiplier*=0.95f;
+				if(charWalkMultiplier < SKIN){
+					charWalkMultiplier = 0;
+					mainChar.transform.localScale = new Vector3(.75f,.75f,0);
+					mainChar.transform.position = new Vector3(-10.21f,-0.11f,0);
+					cadeira2.SetActive(true);
+					mainChar.GetComponent<Animator>().SetTrigger("Sit");
+				}
 			}
-
-
 
 			//Mover camera
 			if(timeCount > iniInterp){
@@ -123,10 +129,25 @@ public class EndGameScene : MonoBehaviour {
 				}else
 					animInterp = 1;
 			}
+
+
 			yield return null; //wait for a frame			
 		}
 
+		//FadeToBlack
+		float blackFade = 0;
+		while(timeCount <= 33){
+			theBlack.color = Color.Lerp(new Color(0,0,0,0),Color.black,blackFade);
+			if(blackFade<1){
+				blackFade += fadeBlackVel;
+				if(blackFade>1){
+					blackFade = 1;
+				}
+			}
+			yield return null; //wait for a frame	
+		}
 
+		//SAIRRRRR!!!!
 
 		//CUIDADO: NÃO FAÇA UM WHILE SEM AO MENOS TER UM YIELD DENTRO
 		//yield return null; //wait for a frame
