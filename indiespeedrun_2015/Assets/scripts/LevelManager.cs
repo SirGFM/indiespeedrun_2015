@@ -14,6 +14,8 @@ public class LevelManager: MonoBehaviour {
     public int curLevel;
     /** The player */
     public Transform player;
+    /** Current width of the level */
+    public float width;
 
 
     public Sprite bebedouro;
@@ -202,14 +204,14 @@ public class LevelManager: MonoBehaviour {
         switch (level) {
             case 0: {
                 // TODO set width
-                PersonBrain.maxHorPosition = width;
+                PersonBrain.maxHorPosition = width - 4.5f;
                 // TODO Spawn stuff
                 spawnNewPerson(PersonBrain.enType.level_1, PersonBrain.enColor.green);
                 spawnNewPerson(PersonBrain.enType.level_2, PersonBrain.enColor.red);
                 } break;
             default: {
                 // TODO set width
-                PersonBrain.maxHorPosition = width;
+                PersonBrain.maxHorPosition = width - 4.5f;
                 // TODO Spawn more stuff
                 spawnNewPerson(PersonBrain.enType.level_0, PersonBrain.enColor.magenta);
                 spawnNewPerson(PersonBrain.enType.level_0, PersonBrain.enColor.magenta);
@@ -239,7 +241,10 @@ public class LevelManager: MonoBehaviour {
             spr.sprite = cenario;
             spr.sortingOrder = 0;
             x += spr.sprite.bounds.extents.x * 2f - 0.1f;
+
+            this.width = x - spr.sprite.bounds.extents.x * 3;
         }
+        PersonBrain.maxHorPosition = this.width + spr.sprite.bounds.extents.x * 2;
         // Get the last rendered scenario store its sprite, so it's texture can be changed
         if (spr != null) {
             spr.sprite = elevador_off;

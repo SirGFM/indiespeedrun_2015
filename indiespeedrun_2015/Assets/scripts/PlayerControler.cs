@@ -3,7 +3,10 @@ using System.Collections.Generic;
 
 public class PlayerControler : PersonBrain {
 
+    /** List of currently overlaping people */
     private List<PersonBrain> overlapping;
+    /** The main camera */
+    private Camera camera;
 
     /** Whether an 'move toward mouse' command was issued */
     private bool hasMouseTarget = false;
