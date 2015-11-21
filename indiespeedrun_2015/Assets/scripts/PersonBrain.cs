@@ -94,6 +94,7 @@ public class PersonBrain : MonoBehaviour {
     protected FixLayer fixLayer;
 
     public Animator animator;
+	public bool isDisabled;
 
     // Use this for initialization
     void Start() {
@@ -103,6 +104,15 @@ public class PersonBrain : MonoBehaviour {
 
     // Update is called once per frame
     void Update() {
+		if (this.isDisabled) {
+			if (this.isRunningAI && this.runningCoroutine != null) {
+				StopCoroutine(this.runningCoroutine);
+				this.isRunningAI = false;
+				this.runningCoroutine = null;
+			}
+
+			return;
+		}
         // TODO Set the animation according with the state
 
         // Forcibly reverse the velocity, if going out of bounds
@@ -446,6 +456,7 @@ public class PersonBrain : MonoBehaviour {
                 PersonBrain.maxHorPosition - 0.5f), 0, 0);
         
         // Activate the object's physics/behavious/etc
+		this.isDisabled = false;
         this.gameObject.SetActive(true);
     }
 

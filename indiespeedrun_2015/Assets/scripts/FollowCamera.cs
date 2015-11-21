@@ -12,7 +12,8 @@ public class FollowCamera : MonoBehaviour {
     public GameObject target;
     public Vector3 offset;
     Vector3 targetPos;
-    private float maxWidth;
+
+	private LevelManager lvlManager;
 
     // Use this for initialization
     void Start() {
@@ -33,20 +34,19 @@ public class FollowCamera : MonoBehaviour {
             if (targetPos.x < 4.5) {
                 targetPos = new Vector3(4.5f, targetPos.y, targetPos.z);
             }
-            if (targetPos.x > maxWidth) {
-                targetPos = new Vector3(maxWidth, targetPos.y, targetPos.z);
-            }
+			if (lvlManager) {
+				if (targetPos.x > lvlManager.width) {
+					targetPos = new Vector3(lvlManager.width, targetPos.y, targetPos.z);
+	            }
+			}
 
             transform.position = Vector3.Lerp(transform.position, targetPos + offset, 0.25f);
 
         }
         else {
-            LevelManager lvlManager;
-
             lvlManager = GameObject.Find("LevelManager").GetComponent<LevelManager>();
             if (lvlManager) {
                 target = lvlManager.player.gameObject;
-                maxWidth = lvlManager.width;
             }
         }
     }

@@ -45,6 +45,9 @@ public class PlayerControler : PersonBrain {
 	
 	// Update is called once per frame
 	void Update () {
+		if (this.isDisabled) {
+			return;
+		}
         if (freezeMov) {
 
         }
@@ -225,6 +228,8 @@ public class PlayerControler : PersonBrain {
         this.transform.position = Vector3.zero;
         // Reset the amount of money
         this.currentMoney = initialMoney;
+
+		this.isDisabled = false;
     }
 
     public void advanceType() {

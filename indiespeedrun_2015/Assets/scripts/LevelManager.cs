@@ -70,6 +70,8 @@ public class LevelManager: MonoBehaviour {
     /** How many people has been bribed through the levels */
     public int accBribed = 0;
 
+	private bool isAnimating;
+
 
     private SoundController sc;
     private AudioSource audSrc;
@@ -105,6 +107,8 @@ public class LevelManager: MonoBehaviour {
             }
         }
 
+		isAnimating = false;
+
         startLevel(curLevel);
     }
 	
@@ -128,14 +132,11 @@ public class LevelManager: MonoBehaviour {
             }
 
             if (this.player.position.x >= PersonBrain.maxHorPosition) {
-                curLevel++;
-                if (curLevel <= lastLevel) {
-                    // TODO FUCKING FIX THIS!
-                    //StartCoroutine(NextLevel());
-                    //NextLevel();
-                    Application.LoadLevel(1);
+				if (!this.isAnimating && curLevel < lastLevel) {
+                    StartCoroutine(NextLevel());
                 }
-                else {
+				else if (!this.isAnimating && curLevel >= lastLevel) {
+					// TODO Start coroutine to fade to black before switching
                     Application.LoadLevel(2);
                 }
             }
@@ -145,11 +146,39 @@ public class LevelManager: MonoBehaviour {
     }
 
     private System.Collections.IEnumerator NextLevel() {
+		if (this.isAnimating) {
+			yield break;
+		}
+
+		this.isAnimating = true;
         Debug.Log("Start lvl transition coroutine");
+
+		foreach (Transform item in this.personsInUse) {
+			Rigidbody2D rbody;
+
+			rbody = item.GetComponent<Rigidbody2D>();
+
+			rbody.velocity = new Vector2(0.0f, Random.Range(8f, 14f));
+			item.GetComponent<PersonBrain>().isDisabled = true;
+		}
+
+		do {
+			Rigidbody2D rbody;
+			
+			rbody = player.GetComponent<Rigidbody2D>();
+			
+			rbody.velocity = new Vector2(1.0f, Random.Range(5.5f, 7.5f));
+			player.GetComponent<PersonBrain>().isDisabled = true;
+		} while (false);
+
+		yield return new WaitForSeconds(3f);
+
         curLevel++;
         startLevel(curLevel);
+
+		this.isAnimating = false;
+
         Debug.Log("Finished lvl transition coroutine");
-        return null;
     }
 
     public int countFreeWithColor(PersonBrain.enColor color, PersonBrain.enType type) {
@@ -239,6 +268,7 @@ public class LevelManager: MonoBehaviour {
         PersonBrain personScript;
 
         newPerson = getNewPerson();
+		newPerson.gameObject.SetActive(true);
         personScript = newPerson.GetComponent<PersonBrain>();
 
         if (personScript) {
